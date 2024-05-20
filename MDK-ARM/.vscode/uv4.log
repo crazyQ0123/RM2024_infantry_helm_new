@@ -1,0 +1,26 @@
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Program Files (x86)\Keil_v5\ARM\ARMCC\Bin'
+Build target 'Robot'
+compiling manifold_usart_task.c...
+..\Robot\Tasks\manifold_usart_task.c(337): warning:  #550-D: variable "MatStatus"  was set but never used
+  			float MatStatus;
+..\Robot\Tasks\manifold_usart_task.c(339): warning:  #177-D: variable "temp_data"  was declared but never referenced
+  			float temp_data[9]; 
+..\Robot\Tasks\manifold_usart_task.c(256): warning:  #177-D: function "Manifold_pose_inf_data_init"  was declared but never referenced
+  static void Manifold_pose_inf_data_init(Manifold_pose_inf_data_m *Manifold_pose_inf_data)
+..\Robot\Tasks\manifold_usart_task.c(264): warning:  #177-D: function "Manifold_state_inf_data_init"  was declared but never referenced
+  static void Manifold_state_inf_data_init(Manifold_state_data_m *Manifold_state_data)
+..\Robot\Tasks\manifold_usart_task.c(272): warning:  #177-D: function "Manifold_pose_inf_data_update"  was declared but never referenced
+  static void Manifold_pose_inf_data_update(Manifold_pose_inf_data_m *Manifold_pose_inf_data)
+..\Robot\Tasks\manifold_usart_task.c(283): warning:  #177-D: function "Manifold_state_inf_data_update"  was declared but never referenced
+  static void Manifold_state_inf_data_update(Manifold_state_data_m *Manifold_state_data , uint8_t manifold_state)
+..\Robot\Tasks\manifold_usart_task.c(236): warning:  #177-D: function "selfaim_init"  was declared but never referenced
+  static void selfaim_init(pid_type_def* pitch_pid,pid_type_def* yaw_pid)
+..\Robot\Tasks\manifold_usart_task.c(335): warning:  #177-D: function "calculateQ"  was declared but never referenced
+  static void calculateQ(mat *Mat_Q)
+..\Robot\Tasks\manifold_usart_task.c: 8 warnings, 0 errors
+compiling kalman_filter_Task.c...
+linking...
+Program Size: Code=57292 RO-data=3624 RW-data=756 ZI-data=60428  
+FromELF: creating hex file...
+"Robot\Robot.axf" - 0 Error(s), 8 Warning(s).
+Build Time Elapsed:  00:00:11
