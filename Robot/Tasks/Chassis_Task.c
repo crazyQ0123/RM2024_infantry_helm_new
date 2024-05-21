@@ -386,6 +386,13 @@ void Chassis_Task(void const * argument)
 			#ifdef GIMBAL_MOTOR_SINGLE_CONTROL
 			CAN_Send_Gimbal_Reset(0x141);
 			CAN_Send_Gimbal_Reset(0x142);
+			while(motor_error_gimbal[0].temperate==0 || motor_error_gimbal[1].temperate==0 || motor_error_gimbal[0].error_State!=0 || motor_error_gimbal[1].error_State!=0)
+			{
+				CAN_Send_Gimbal_Reset(0x141);
+				vTaskDelay(1);
+				CAN_Send_Gimbal_Reset(0x142);
+				vTaskDelay(1);
+			}
 			#endif
 			__disable_irq();
 			NVIC_SystemReset();

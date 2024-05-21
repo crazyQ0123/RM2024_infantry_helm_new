@@ -24,6 +24,13 @@
         (ptr)->given_current = 	(uint16_t)((data)[3] << 8 | (data)[2]); 				\
         (ptr)->temperate = 			(data)[1];                              				\
     }
+
+#define motor_measure_error(ptr, data)                                					\
+    {                                                                   				\
+        (ptr)->temperate = 			(data)[1];                             					\
+        (ptr)->voltage = 			  (uint16_t)((data)[4] << 8 | (data)[3]); 				\
+			  (ptr)->error_State = 		(data)[7];                              				\
+    }
 		
 #define get_can_data_16(ptr, data)															\
     {																														\
@@ -68,6 +75,7 @@ void can_filter_init(void)
 uint8_t rx_data[8];
 
 motor_measure_t motor_measure_gimbal[3];
+motor_error_t motor_error_gimbal[2];
 uint32_t id=0;
 
 int32_t dial_angle=0;
@@ -114,6 +122,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 				if(rx_data[0]==0xA1)
 				{
 					motor_measure_LK(&motor_measure_gimbal[i], rx_data);
+				}
+				else if(rx_data[0]==0x9A)
+				{
+					motor_measure_error(&motor_error_gimbal[i],rx_data);
 				}
 				break;
 			}
