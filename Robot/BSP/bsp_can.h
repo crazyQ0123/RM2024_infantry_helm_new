@@ -14,10 +14,6 @@ typedef struct
 extern void can_filter_init(void);
 extern motor_measure_t motor_measure_gimbal[3];
 
-extern uint8_t rx_data2[8];
 extern uint8_t rx_data[8];
-extern int16_t rx_chassis_data1[8];
-extern int16_t rx_chassis_data2[8];
-extern float rx_chassis_debug[4];
 
 #endif

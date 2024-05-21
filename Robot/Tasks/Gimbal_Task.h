@@ -18,6 +18,9 @@
 #define Get_BYTE1(dwTemp)       (*((char *)(&dwTemp) + 1))	 
 #define Get_BYTE2(dwTemp)       (*((char *)(&dwTemp) + 2))
 #define Get_BYTE3(dwTemp)       (*((char *)(&dwTemp) + 3))
+
+#define GIMBAL_MOTOR_SINGLE_CONTROL
+
 typedef struct
 {
   fp32 INS_speed;

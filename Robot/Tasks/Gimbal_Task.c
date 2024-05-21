@@ -67,7 +67,6 @@ float pitch_pid_rate=0.25f;
 #define PITCH_ANGLE_SET_MAX 35.0f
 #define PITCH_ANGLE_SET_MIN -24.0f
 
-#define GIMBAL_MOTOR_SINGLE_CONTROL
 
 gimbal_motor_t gimbal_LK[2];
 uint8_t yaw_mode=0,yaw_mode_last=0;//0:speed,1:angle

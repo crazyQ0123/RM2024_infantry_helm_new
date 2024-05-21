@@ -65,12 +65,7 @@ void can_filter_init(void)
     HAL_CAN_Start(&hcan2);
     HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
-
-uint8_t rx_data2[8];
 uint8_t rx_data[8];
-int16_t rx_chassis_data1[8];
-int16_t rx_chassis_data2[8];
-float rx_chassis_debug[4];
 
 motor_measure_t motor_measure_gimbal[3];
 uint32_t id=0;
@@ -116,7 +111,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 			{
 				static uint8_t i = 0;
 				i = rx_header.StdId - CAN_LK_M1_ID;	
-				motor_measure_LK(&motor_measure_gimbal[i], rx_data);
+				if(rx_data[0]==0xA1)
+				{
+					motor_measure_LK(&motor_measure_gimbal[i], rx_data);
+				}
 				break;
 			}
 			

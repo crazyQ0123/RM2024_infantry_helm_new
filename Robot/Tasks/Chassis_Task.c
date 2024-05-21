@@ -12,9 +12,9 @@
 #include "bsp_cap.h"
 #include "referee_usart_task.h"
 
-#define ADJUST_VX_MAX 75
-#define ADJUST_VY_MAX 75
-#define ADJUST_WZ_MAX 75
+#define ADJUST_VX_MAX 660*3
+#define ADJUST_VY_MAX 660*3
+#define ADJUST_WZ_MAX 660*3
 #define SLOW_VX_MAX 660*6
 #define SLOW_VY_MAX 660*6
 #define SLOW_WZ_MAX 660*6
@@ -48,47 +48,24 @@ float chassis_power=0,chassis_power_limit=0,chassis_power_buffer=0;
 kf_data_t helm_speed[3];
 
 
-static void CAN_Send_int16(uint16_t Id ,int16_t data1, int16_t data2, int16_t data3, int16_t data4)
+void CAN_Send_Gimbal_Reset(uint32_t Id)
 {
-	CAN_TxHeaderTypeDef  chassis_tx_message={0};
-	uint8_t              chassis_can_send_data[8]={0};
-	uint32_t send_mail_box;
-	chassis_tx_message.StdId = Id;
-	chassis_tx_message.IDE = CAN_ID_STD;
-	chassis_tx_message.RTR = CAN_RTR_DATA;
-	chassis_tx_message.DLC = 0x08;
-	chassis_can_send_data[0] = data1 >> 8;
-	chassis_can_send_data[1] = data1;
-	chassis_can_send_data[2] = data2 >> 8;
-	chassis_can_send_data[3] = data2;
-	chassis_can_send_data[4] = data3 >> 8;
-	chassis_can_send_data[5] = data3;
-	chassis_can_send_data[6] = data4 >> 8;
-	chassis_can_send_data[7] = data4;
-
-	HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
-}
-
-static void CAN_Send_uint8(uint16_t Id,	uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4,
-																				uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8)
-{
-	CAN_TxHeaderTypeDef  chassis_tx_message={0};
-	uint8_t              chassis_can_send_data[8]={0};
-	uint32_t send_mail_box;
-	chassis_tx_message.StdId = Id;
-	chassis_tx_message.IDE = CAN_ID_STD;
-	chassis_tx_message.RTR = CAN_RTR_DATA;
-	chassis_tx_message.DLC = 0x08;
-	chassis_can_send_data[0] = data1;
-	chassis_can_send_data[1] = data2;
-	chassis_can_send_data[2] = data3;
-	chassis_can_send_data[3] = data4;
-	chassis_can_send_data[4] = data5;
-	chassis_can_send_data[5] = data6;
-	chassis_can_send_data[6] = data7;
-	chassis_can_send_data[7] = data8;
-
-	HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
+	CAN_TxHeaderTypeDef  motor_tx_message={0};
+	uint8_t              motor_can_send_data[8]={0};
+	uint32_t send_mail_box=0;
+	motor_tx_message.StdId = Id;
+	motor_tx_message.IDE = CAN_ID_STD;
+	motor_tx_message.RTR = CAN_RTR_DATA;
+	motor_tx_message.DLC = 0x08;
+	motor_can_send_data[0] = 0x9B;
+	motor_can_send_data[1] = 0x00;
+	motor_can_send_data[2] = 0x00;
+	motor_can_send_data[3] = 0x00;
+	motor_can_send_data[4] = 0x00;
+	motor_can_send_data[5] = 0x00;
+	motor_can_send_data[6] = 0x00;
+	motor_can_send_data[7] = 0x00;
+	HAL_CAN_AddTxMessage(&hcan1, &motor_tx_message, motor_can_send_data, &send_mail_box);
 }
 
 static void chassis_vector_set(void)
@@ -164,7 +141,7 @@ static void chassis_pc_ctrl(void)
 		{
 			temp_vx = FAST_VX_MAX;
 			temp_vy = FAST_VY_MAX;
-			temp_vy = FAST_WZ_MAX;
+			temp_wz = FAST_WZ_MAX;
 		}
 		
 	}
@@ -362,6 +339,7 @@ void Chassis_Task(void const * argument)
 	for(uint8_t i=0;i<3;i++)
 		Kalman_Init(&helm_speed[i],0.1,100);
 	helm_pid_init();
+//	PID_init_s(&chassis_control.chassis_psi,0,8000,0,48000,10000,0);
 	PID_init_s(&chassis_control.chassis_psi,0,5000,0,5000,10000,0);
 
 	while(1)
@@ -405,6 +383,10 @@ void Chassis_Task(void const * argument)
 		//software reset mcu
 		if(KEYB_MCU_RESET)
 		{
+			#ifdef GIMBAL_MOTOR_SINGLE_CONTROL
+			CAN_Send_Gimbal_Reset(0x141);
+			CAN_Send_Gimbal_Reset(0x142);
+			#endif
 			__disable_irq();
 			NVIC_SystemReset();
 		}
