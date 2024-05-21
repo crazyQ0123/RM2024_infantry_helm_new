@@ -20,10 +20,10 @@
 //-| |-
 //-| |-
 //BACK
-#define HELM_OFFSET_0 7485
-#define HELM_OFFSET_1 120
-#define HELM_OFFSET_2 7460
-#define HELM_OFFSET_3 4779
+#define HELM_OFFSET_0 4764
+#define HELM_OFFSET_1 4718
+#define HELM_OFFSET_2 7461
+#define HELM_OFFSET_3 2067
 
 helm_state_t helm[4];
 chassis_helm_t chassis_helm;

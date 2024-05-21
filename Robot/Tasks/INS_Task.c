@@ -176,8 +176,6 @@ fp32 INS_angle_deg[3] = {0.0f, 0.0f, 0.0f};
 
 
 
-
-
 /**
   * @brief          imu task, init bmi088, ist8310, calculate the euler angle
   * @param[in]      pvParameters: NULL
@@ -232,9 +230,10 @@ void INS_Task(void const *pvParameters)
 
     imu_start_dma_flag = 1;
 		
-		bmi088_offset_data.gyro[0] = 0.00164404849f; 
-		bmi088_offset_data.gyro[1] = 0.00127476268f;
-		bmi088_offset_data.gyro[2] = 0.00238866196f;
+		bmi088_offset_data.gyro[0] = 0.00393505488f; 
+		bmi088_offset_data.gyro[1] = -1.38485229e-05f;
+		bmi088_offset_data.gyro[2] = -0.00148035458f;
+		
 //		mpu_offset_clc();
     
     while (1)

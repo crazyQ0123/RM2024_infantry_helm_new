@@ -79,7 +79,7 @@ int auto_aim_vx=0,auto_aim_vz=0;
 float aim_adjust_yaw,aim_adjust_pitch;
 
 uint8_t identify_flag=1;
-fp32 balance_current = 0;
+fp32 balance_current = 250;
 //kf_data_t pitch_kf;
 
 extern ext_robot_status_t Game_Robot_Status;
@@ -361,20 +361,19 @@ void Pitch_Motor_Control(void)
         }
     }
 
-    if(gimbal_LK[1].INS_angle_set>PITCH_ANGLE_SET_MAX && gimbal_LK[1].INS_speed_set>0)
-		{
-			gimbal_LK[1].INS_angle_set=PITCH_ANGLE_SET_MAX;
-			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].INS_angle, gimbal_LK[1].INS_angle_set);
-			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
-		}
-		else if(gimbal_LK[1].INS_angle_set<PITCH_ANGLE_SET_MIN && gimbal_LK[1].INS_speed_set<0)
-		{
-			gimbal_LK[1].INS_angle_set=PITCH_ANGLE_SET_MIN;
-			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].INS_angle, gimbal_LK[1].INS_angle_set);
-			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
-		}
+//    if(gimbal_LK[1].INS_angle_set>PITCH_ANGLE_SET_MAX && gimbal_LK[1].INS_speed_set>0)
+//		{
+//			gimbal_LK[1].INS_angle_set=PITCH_ANGLE_SET_MAX;
+//			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].INS_angle, gimbal_LK[1].INS_angle_set);
+//			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
+//		}
+//		else if(gimbal_LK[1].INS_angle_set<PITCH_ANGLE_SET_MIN && gimbal_LK[1].INS_speed_set<0)
+//		{
+//			gimbal_LK[1].INS_angle_set=PITCH_ANGLE_SET_MIN;
+//			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].INS_angle, gimbal_LK[1].INS_angle_set);
+//			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
+//		}
 		PID_calc(&gimbal_LK[1].speed_pid, gimbal_LK[1].INS_speed, gimbal_LK[1].INS_speed_set);
-		balance_current = GRAVITY_BALANCE(gimbal_LK[1].INS_angle);
     gimbal_LK[1].give_current = gimbal_LK[1].speed_pid.out + balance_current;
 
 }
@@ -489,9 +488,11 @@ void Gimbal_Task(void const * argument)
 			#ifdef GIMBAL_MOTOR_SINGLE_CONTROL
 			CAN_cmd_LK_Yaw(0);
 			vTaskDelay(1);
-			CAN_cmd_LK_Pitch(0);
+			CAN_cmd_LK_Pitch(balance_current-65);
+//			CAN_cmd_LK_Pitch(0);
 			#endif
-			
+			gimbal_LK[0].INS_angle_set=gimbal_LK[0].INS_angle;
+			gimbal_LK[1].INS_angle_set = gimbal_LK[1].INS_angle;
 			vTaskDelay(1);
 			CAN_cmd_AMMO(0, 0, 0, 0);
 		}
