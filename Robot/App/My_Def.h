@@ -6,6 +6,9 @@
 #include "tim.h"
 extern RC_ctrl_t rc_ctrl_last;
 
+//Model Switch
+#define INFANTRY_HELM_NEW
+
 //LED
 #define LED_PIN_PORT		GPIOH	
 
@@ -23,8 +26,6 @@ extern RC_ctrl_t rc_ctrl_last;
 #define DATA_LIMIT(n,min,max)				((n)>(max) ? (max) : ((n)<(min) ? (min) : (n)))
 #define DEADBAND(n,db)							(ABS(n) >= ABS(db) ? (n) : 0)
 #define RAMP_CTRL(ref,set,acc)	((ref) + DATA_LIMIT((acc),0,1) * ((set) - (ref)))
-#define GRAVITY_BALANCE(n)			(0.0018*n*n*n - 0.0649*n*n + 6.7329*n + 38.363)
-
 
 //RMÒ£¿ØÆ÷
 #define RollWheel							rc_ctrl.rc.ch[4]			//Ò£¿ØÆ÷×ó²à¹öÂÖ£¬×ó¡úÓÒ£º660¡ú-660

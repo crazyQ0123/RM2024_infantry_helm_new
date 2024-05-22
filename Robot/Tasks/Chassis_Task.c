@@ -32,10 +32,8 @@
 //#define BUFFER_TOTAL_CURRENT_LIMIT      16000.0f
 #define POWER_TOTAL_CURRENT_LIMIT       22000.0f
 #define WARNING_POWER_BUFF  60.0f
-
 #define POWER_HELM_CURRENT_LIMIT       8000.0f
 
-#define CHASSIS_FOLLOW_GIMBAL_ANGLE_ZERO 37964
 #define GIMBAL_ECD_RANGE 65536
 
 #define sin_45 0.7071067811865475244f
@@ -293,17 +291,6 @@ float ang_offset=6.0f;
 //车体至底盘解算
 void chassis_solve()
 {
-//	chassis_helm.vx=chassis_control.vx*arm_cos_f32(ang_err)+chassis_control.vy*arm_sin_f32(ang_err);
-//	chassis_helm.vy=-chassis_control.vx*arm_sin_f32(ang_err)+chassis_control.vy*arm_cos_f32(ang_err);
-//	chassis_helm.wz=chassis_control.wz;
-	
-//	chassis_helm.vx=KalmanFilterCalc(&helm_speed[0], chassis_control.vx*arm_cos_f32(ang_err)+chassis_control.vy*arm_sin_f32(ang_err));
-//	chassis_helm.vy=KalmanFilterCalc(&helm_speed[1], -chassis_control.vx*arm_sin_f32(ang_err)+chassis_control.vy*arm_cos_f32(ang_err));
-//	chassis_helm.wz=KalmanFilterCalc(&helm_speed[2], chassis_control.wz);
-//	chassis_helm.vx=DEADBAND(chassis_helm.vx,50);
-//	chassis_helm.vy=DEADBAND(chassis_helm.vy,50);
-//	chassis_helm.wz=DEADBAND(chassis_helm.wz,50);
-	
 	KalmanFilterCalc(&helm_speed[0], chassis_control.vx);
 	KalmanFilterCalc(&helm_speed[1], chassis_control.vy);
 	KalmanFilterCalc(&helm_speed[2], chassis_control.wz);

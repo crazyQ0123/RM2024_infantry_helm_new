@@ -67,6 +67,14 @@ float pitch_pid_rate=0.25f;
 #define PITCH_ANGLE_SET_MAX 35.0f
 #define PITCH_ANGLE_SET_MIN -24.0f
 
+#ifdef INFANTRY_HELM_NEW
+#define GRAVITY_BALANCE(n)			(250)
+#endif
+#ifdef INFANTRY_HELM_OLD
+#define GRAVITY_BALANCE(n)			(0.0018*(n)*(n)*(n) - 0.0649*(n)*(n) + 6.7329*(n) + 38.363)
+#endif
+
+
 
 gimbal_motor_t gimbal_LK[2];
 uint8_t yaw_mode=0,yaw_mode_last=0;//0:speed,1:angle
@@ -230,6 +238,9 @@ void Gimbal_Motor_Data_Update(void)
 	gimbal_LK[1].INS_angle=INS_angle_deg[2];
 	gimbal_LK[1].ENC_angle=motor_measure_gimbal[1].ecd;
 	gimbal_LK[1].ENC_speed=motor_measure_gimbal[1].speed_rpm;
+	
+	//÷ÿ¡¶≤π≥•
+	balance_current = GRAVITY_BALANCE(gimbal_LK[1].INS_angle);
 }
 
 void Yaw_Motor_Control(void)
@@ -487,8 +498,7 @@ void Gimbal_Task(void const * argument)
 			#ifdef GIMBAL_MOTOR_SINGLE_CONTROL
 			CAN_cmd_LK_Yaw(0);
 			vTaskDelay(1);
-			CAN_cmd_LK_Pitch(balance_current-65);
-//			CAN_cmd_LK_Pitch(0);
+			CAN_cmd_LK_Pitch(balance_current*0.7f);
 			#endif
 			gimbal_LK[0].INS_angle_set=gimbal_LK[0].INS_angle;
 			gimbal_LK[1].INS_angle_set = gimbal_LK[1].INS_angle;
