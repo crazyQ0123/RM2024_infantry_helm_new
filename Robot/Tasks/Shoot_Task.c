@@ -14,15 +14,15 @@
 #include "Usb_Task.h"
 
 
-#define SHOOT_MOTOR_SPEED_PID_KP 5.0f
+#define SHOOT_MOTOR_SPEED_PID_KP 8.0f
 #define SHOOT_MOTOR_SPEED_PID_KI 0.1f
 #define SHOOT_MOTOR_SPEED_PID_KD 0.0f
 #define SHOOT_MOTOR_SPEED_PID_MAX_OUT 16000.0f
 #define SHOOT_MOTOR_SPEED_PID_MAX_IOUT 10000.0f
 
-#define SHOOT_MOTOR_ANGLE_PID_KP 0.2f
+#define SHOOT_MOTOR_ANGLE_PID_KP 0.6f
 #define SHOOT_MOTOR_ANGLE_PID_KI 0.0f
-#define SHOOT_MOTOR_ANGLE_PID_KD 0.2f
+#define SHOOT_MOTOR_ANGLE_PID_KD 0.8f
 #define SHOOT_MOTOR_ANGLE_PID_MAX_OUT 10000.0f
 #define SHOOT_MOTOR_ANGLE_PID_MAX_IOUT 10000.0f
 
@@ -41,7 +41,7 @@ uint16_t textspeed=2000;
 #ifndef fric_15m
 uint16_t fric_15m = 1475;
 uint16_t fric_18m = 1515;
-uint16_t fric_30m = 1750;
+uint16_t fric_30m = 1690;//1750;
 #endif
 
 void Shoot_Motor_Init(void)

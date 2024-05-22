@@ -92,7 +92,12 @@ void Switch_Task(void const * argument)
 					if(if_single_hit==0)
 					{
 						if_single_hit=1;
-						shoot_m2006[0].angle_set=shoot_m2006[0].angle+8192*60/10;
+						#ifdef INFANTRY_HELM_NEW
+						shoot_m2006[0].angle_set=shoot_m2006[0].angle+8192*36/8;
+						#endif
+						#ifdef INFANTRY_HELM_OLD
+						shoot_m2006[0].angle_set=shoot_m2006[0].angle+8192*36/6;
+						#endif
 					}
 				}
 				

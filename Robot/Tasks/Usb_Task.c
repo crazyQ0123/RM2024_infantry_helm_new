@@ -1,7 +1,7 @@
 #include "USB_Task.h"
 
 
-uint8_t Autoaim_Mode = AUTOAIM_MODE_ANTI_TOP;
+uint8_t Autoaim_Mode = AUTOAIM_MODE_BIG_ENERGY;
 
 void usb_task(void const * argument)
 {
