@@ -12,9 +12,9 @@
 #include "bsp_cap.h"
 #include "referee_usart_task.h"
 
-#define ADJUST_VX_MAX 660*3
-#define ADJUST_VY_MAX 660*3
-#define ADJUST_WZ_MAX 660*3
+#define ADJUST_VX_MAX 660*2
+#define ADJUST_VY_MAX 660*2
+#define ADJUST_WZ_MAX 660*2
 #define SLOW_VX_MAX 660*6
 #define SLOW_VY_MAX 660*6
 #define SLOW_WZ_MAX 660*6
@@ -113,12 +113,7 @@ static void chassis_pc_ctrl(void)
 		return;
 	}
 	
-	if(KEY_C)
-	{
-		temp_vx = ADJUST_VX_MAX;
-		temp_vy = ADJUST_VY_MAX;
-		temp_wz = ADJUST_WZ_MAX;
-	}
+	
 	else
 	{
 		if(Speed_Mode==0)
@@ -160,6 +155,10 @@ static void chassis_pc_ctrl(void)
 	if(KEY_SHIFT)
 	{
 		chassis_control.wz = temp_wz;
+	}
+	if(KEY_C)
+	{
+		chassis_control.vx = ADJUST_VX_MAX;
 	}
 }
 

@@ -15,7 +15,7 @@
 
 
 #define SHOOT_MOTOR_SPEED_PID_KP 8.0f
-#define SHOOT_MOTOR_SPEED_PID_KI 0.1f
+#define SHOOT_MOTOR_SPEED_PID_KI 0.3f
 #define SHOOT_MOTOR_SPEED_PID_KD 0.0f
 #define SHOOT_MOTOR_SPEED_PID_MAX_OUT 16000.0f
 #define SHOOT_MOTOR_SPEED_PID_MAX_IOUT 10000.0f
@@ -109,16 +109,16 @@ void Dial_Motor_Control(void)
 {
 	if(Game_Robot_Status.power_management_shooter_output==0x01)
 	{
-		if(abs(shoot_m2006[0].give_current)>10000&&fabs(shoot_m2006[0].speed)<100)//·À¶Â×ª
+		if(abs(shoot_m2006[0].give_current)>12000&&fabs(shoot_m2006[0].speed)<100)//·À¶Â×ª
 		{
 			dial_stop_cnt++;
-			if(dial_stop_cnt>250)
+			if(dial_stop_cnt>100)
 			{
 				if(shoot_m2006[0].give_current>0)
-					shoot_m2006[0].give_current=1000;
+					shoot_m2006[0].give_current=-3000;
 				else
-					shoot_m2006[0].give_current=-1000;
-				vTaskDelay(500);
+					shoot_m2006[0].give_current=3000;
+				vTaskDelay(200);
 				Shoot_Motor_Init();
 				PID_clear(&shoot_m2006[0].speed_pid);
 				PID_clear(&shoot_m2006[0].angle_pid);
