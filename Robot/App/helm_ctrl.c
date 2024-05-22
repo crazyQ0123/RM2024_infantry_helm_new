@@ -60,10 +60,14 @@ void helm_pid_init()
 	helm[3].ecd_offset=HELM_OFFSET_3;
 	for(uint8_t i=0;i<4;i++)
 	{
-		PID_init_s(&helm[i].M6020_angle_pid	,0			,350		,0			,5000			,1000		,0);
+		PID_init_s(&helm[i].M6020_angle_pid	,0			,250		,0			,1000			,1000		,0);
 		PID_init_s(&helm[i].M6020_speed_pid	,0			,200		,5			,0			,25000	,10000);
-		PID_init_s(&helm[i].M3508_speed_pid	,0			,5			,0.01		,0			,16000	,2000);
+		PID_init_s(&helm[i].M3508_speed_pid	,1			,10			,1		,0			,16000	,5000);
 	}
+		helm[0].angle_set =  45/57.3f;
+		helm[1].angle_set = -45/57.3f;
+		helm[2].angle_set =  45/57.3f;
+		helm[3].angle_set = -45/57.3f;
 }
 
 void helm_pid_update()
@@ -136,29 +140,30 @@ void helm_current_off()
 
 void helm_solve()
 {
-	if(chassis_helm.vx==0&&chassis_helm.vy==0)
-	{
-		if(!(helm[0].angle_set ==  45/57.3f&&
-		helm[1].angle_set == -45/57.3f&&
-		helm[2].angle_set ==  45/57.3f&&
-		helm[3].angle_set == -45/57.3f))
-		{
-			for(uint8_t i=0;i<4;i++)
-			{
-				PID_clear(&helm[i].M6020_speed_pid);
-			}
-		}
-			
-		helm[0].angle_set =  45/57.3f;
-		helm[1].angle_set = -45/57.3f;
-		helm[2].angle_set =  45/57.3f;
-		helm[3].angle_set = -45/57.3f;
-		helm[0].speed_set = chassis_helm.wz;
-		helm[1].speed_set = -chassis_helm.wz;
-		helm[2].speed_set = -chassis_helm.wz;
-		helm[3].speed_set = chassis_helm.wz;
-	}
-	else
+//	if(chassis_helm.vx==0&&chassis_helm.vy==0)
+//	{
+//		if(!(helm[0].angle_set ==  45/57.3f&&
+//		helm[1].angle_set == -45/57.3f&&
+//		helm[2].angle_set ==  45/57.3f&&
+//		helm[3].angle_set == -45/57.3f))
+//		{
+//			for(uint8_t i=0;i<4;i++)
+//			{
+//				PID_clear(&helm[i].M6020_speed_pid);
+//			}
+//		}
+//			
+//		helm[0].angle_set =  45/57.3f;
+//		helm[1].angle_set = -45/57.3f;
+//		helm[2].angle_set =  45/57.3f;
+//		helm[3].angle_set = -45/57.3f;
+//		helm[0].speed_set = chassis_helm.wz;
+//		helm[1].speed_set = -chassis_helm.wz;
+//		helm[2].speed_set = -chassis_helm.wz;
+//		helm[3].speed_set = chassis_helm.wz;
+//	}
+//	else
+	if(chassis_helm.vx!=0||chassis_helm.vy!=0||chassis_helm.wz!=0)
 	{
 		helm[0].speed_set = sqrt(pow(chassis_helm.vx+chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy+chassis_helm.wz*sin_45,2.0f));
 		helm[1].speed_set = sqrt(pow(chassis_helm.vx-chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy+chassis_helm.wz*sin_45,2.0f));
@@ -169,5 +174,12 @@ void helm_solve()
 		arm_atan2_f32(chassis_helm.vy+chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[1].angle_set );
 		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[2].angle_set );
 		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx+chassis_helm.wz*cos_45,&helm[3].angle_set );
+	}
+	else
+	{
+		helm[0].speed_set = 0;
+		helm[1].speed_set = 0;
+		helm[2].speed_set = 0;
+		helm[3].speed_set = 0;
 	}
 }

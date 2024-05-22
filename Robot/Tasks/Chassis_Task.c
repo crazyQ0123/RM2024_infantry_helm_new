@@ -294,15 +294,19 @@ void chassis_solve()
 	KalmanFilterCalc(&helm_speed[0], chassis_control.vx);
 	KalmanFilterCalc(&helm_speed[1], chassis_control.vy);
 	KalmanFilterCalc(&helm_speed[2], chassis_control.wz);
+	float temp_speed_vx=DEADBAND(helm_speed[0].out,20);
+	float temp_speed_vy=DEADBAND(helm_speed[1].out,20);
+	float temp_speed_wz=DEADBAND(helm_speed[2].out,20);
 	float ang_err = helm_speed[2].out*ang_offset*0.00001f+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI;
-	chassis_helm.vx=helm_speed[0].out*arm_cos_f32(ang_err)+helm_speed[1].out*arm_sin_f32(ang_err);
-	chassis_helm.vy=-helm_speed[0].out*arm_sin_f32(ang_err)+helm_speed[1].out*arm_cos_f32(ang_err);
-	chassis_helm.wz=helm_speed[2].out;
-	chassis_helm.vx=DEADBAND(chassis_helm.vx,20);
-	chassis_helm.vy=DEADBAND(chassis_helm.vy,20);
-	chassis_helm.wz=DEADBAND(chassis_helm.wz,20);
+	chassis_helm.vx=temp_speed_vx*arm_cos_f32(ang_err)+temp_speed_vy*arm_sin_f32(ang_err);
+	chassis_helm.vy=-temp_speed_vx*arm_sin_f32(ang_err)+temp_speed_vy*arm_cos_f32(ang_err);
+	chassis_helm.wz=temp_speed_wz;
 	
-	if(chassis_follow_gimbal_changing==0&&!KEY_SHIFT&&rc_ctrl.rc.s[1]==RC_SW_UP&&fabs((float)rc_ctrl.rc.ch[4])<100)
+	if(	!(ABS(chassis_control.vx)<50&&ABS(chassis_control.vy)<50) &&
+			!chassis_follow_gimbal_changing &&
+			!KEY_SHIFT &&
+			rc_ctrl.rc.s[1]==RC_SW_UP &&
+			fabs((float)rc_ctrl.rc.ch[4])<100	)
 	{
 		float ang_err_all[4];
 		ang_err_all[0] = limit_pi(0.0f*PI+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
@@ -339,18 +343,16 @@ void Chassis_Task(void const * argument)
 		{
 			chassis_pc_ctrl();
 		}
-//		if(rc_ctrl.rc.s[1]==RC_SW_UP)
-//		{
-//			chassis_control.wz = ROTATE_WZ_MAX;
-//		}
-		
-		chassis_solve();
-		helm_solve();
-		helm_pid_update();
+
 		if(rc_ctrl.rc.s[1]==RC_SW_DOWN)
+		{
 			helm_current_off();
+		}
 		else
 		{
+			chassis_solve();
+			helm_solve();
+			helm_pid_update();
 			if(KEYB_FLY)	//·ÉÆÂ
 			{
 				helm_current_send();
