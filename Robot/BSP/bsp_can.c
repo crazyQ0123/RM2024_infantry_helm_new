@@ -123,7 +123,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 				{
 					motor_measure_LK(&motor_measure_gimbal[i], rx_data);
 				}
-				else if(rx_data[0]==0x9A)
+				else if(rx_data[0]==0x9B)
 				{
 					motor_measure_error(&motor_error_gimbal[i],rx_data);
 				}

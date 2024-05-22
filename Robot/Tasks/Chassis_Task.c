@@ -34,8 +34,6 @@
 #define WARNING_POWER_BUFF  60.0f
 #define POWER_HELM_CURRENT_LIMIT       8000.0f
 
-#define GIMBAL_ECD_RANGE 65536
-
 #define sin_45 0.7071067811865475244f
 #define cos_45 0.7071067811865475244f
 
@@ -301,6 +299,7 @@ void chassis_solve()
 	chassis_helm.vx=temp_speed_vx*arm_cos_f32(ang_err)+temp_speed_vy*arm_sin_f32(ang_err);
 	chassis_helm.vy=-temp_speed_vx*arm_sin_f32(ang_err)+temp_speed_vy*arm_cos_f32(ang_err);
 	chassis_helm.wz=temp_speed_wz;
+	chassis_control.chassis_follow_gimbal_err = limit_pi((chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
 	
 	if(	!(ABS(chassis_control.vx)<50&&ABS(chassis_control.vy)<50) &&
 			!chassis_follow_gimbal_changing &&
@@ -309,10 +308,10 @@ void chassis_solve()
 			fabs((float)rc_ctrl.rc.ch[4])<100	)
 	{
 		float ang_err_all[4];
-		ang_err_all[0] = limit_pi(0.0f*PI+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
-		ang_err_all[1] = limit_pi(0.5f*PI+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
-		ang_err_all[2] = limit_pi(1.0f*PI+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
-		ang_err_all[3] = limit_pi(1.5f*PI+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
+		ang_err_all[0] = limit_pi(0.0f*PI+chassis_control.chassis_follow_gimbal_err);
+		ang_err_all[1] = limit_pi(0.5f*PI+chassis_control.chassis_follow_gimbal_err);
+		ang_err_all[2] = limit_pi(1.0f*PI+chassis_control.chassis_follow_gimbal_err);
+		ang_err_all[3] = limit_pi(1.5f*PI+chassis_control.chassis_follow_gimbal_err);
 		float ang_err=ang_err_all[0];
 		for(uint8_t i=0;i<4;i++)
 			if(fabs(ang_err_all[i])<fabs(ang_err))ang_err=ang_err_all[i];
@@ -343,6 +342,10 @@ void Chassis_Task(void const * argument)
 		{
 			chassis_pc_ctrl();
 		}
+		
+		chassis_solve();
+		helm_solve();
+		helm_pid_update();
 
 		if(rc_ctrl.rc.s[1]==RC_SW_DOWN)
 		{
@@ -350,9 +353,6 @@ void Chassis_Task(void const * argument)
 		}
 		else
 		{
-			chassis_solve();
-			helm_solve();
-			helm_pid_update();
 			if(KEYB_FLY)	//·ÉÆÂ
 			{
 				helm_current_send();

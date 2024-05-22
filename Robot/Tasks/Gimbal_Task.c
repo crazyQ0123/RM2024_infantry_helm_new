@@ -20,8 +20,8 @@
 #define RAD_TO_ANGLE 57.295779513082320876798154814105f
 #endif
 
-#define YAW_MOUSE_SEN   0.01f
-#define PITCH_MOUSE_SEN 0.01f
+#define YAW_MOUSE_SEN   0.02f
+#define PITCH_MOUSE_SEN 0.02f
 
 #define PITCH_ENC_ANGLE_MAX 8000
 #define PITCH_ENC_ANGLE_MIN 450
@@ -69,9 +69,11 @@ float pitch_pid_rate=0.25f;
 
 #ifdef INFANTRY_HELM_NEW
 #define GRAVITY_BALANCE(n)			(250)
+#define PITCH_ANGLE_ZERO 318.0f
 #endif
 #ifdef INFANTRY_HELM_OLD
 #define GRAVITY_BALANCE(n)			(0.0018*(n)*(n)*(n) - 0.0649*(n)*(n) + 6.7329*(n) + 38.363)
+#define PITCH_ANGLE_ZERO 0.0f
 #endif
 
 
@@ -88,6 +90,7 @@ float aim_adjust_yaw,aim_adjust_pitch;
 uint8_t identify_flag=1;
 fp32 balance_current = 250;
 //kf_data_t pitch_kf;
+float Pitch_ang_min;
 
 extern ext_robot_status_t Game_Robot_Status;
 extern fifo_s_t Referee_FIFO;
@@ -236,8 +239,14 @@ void Gimbal_Motor_Data_Update(void)
 	//pitch
 	gimbal_LK[1].INS_speed=bmi088_real_data.gyro[1];
 	gimbal_LK[1].INS_angle=INS_angle_deg[2];
-	gimbal_LK[1].ENC_angle=motor_measure_gimbal[1].ecd;
+	gimbal_LK[1].ENC_angle=motor_measure_gimbal[1].ecd/((fp32)GIMBAL_ECD_RANGE)*360.0f;
 	gimbal_LK[1].ENC_speed=motor_measure_gimbal[1].speed_rpm;
+	gimbal_LK[1].ENC_angle_actual = gimbal_LK[1].ENC_angle - PITCH_ANGLE_ZERO;
+	
+#ifdef INFANTRY_HELM_NEW
+//	if(chassis_control.chassis_follow_gimbal_err>=-PI&&chassis_control.chassis_follow_gimbal_err<
+#endif
+
 	
 	//ÖØÁ¦²¹³¥
 	balance_current = GRAVITY_BALANCE(gimbal_LK[1].INS_angle);
@@ -316,12 +325,6 @@ void Yaw_Motor_Control(void)
 
 void Pitch_Motor_Control(void)
 {
-//    gimbal_LK[1].ENC_angle_actual = (float)(((uint16_t)gimbal_LK[1].ENC_angle + (8192 - 5077)) % 8192) / 8192.0f * 360.0f;
-//    if(gimbal_LK[1].ENC_angle_actual > 180)
-//    {
-//        gimbal_LK[1].ENC_angle_actual -= 360;
-//    }
-
    if((rc_ctrl.mouse.press_r||rc_ctrl.rc.ch[4]<-200)&&nuc_receive_data.aim_data_received.success==1 && !is_valid())
     {
         pitch_angle_err = nuc_receive_data.aim_data_received.pitch - gimbal_LK[1].INS_angle;

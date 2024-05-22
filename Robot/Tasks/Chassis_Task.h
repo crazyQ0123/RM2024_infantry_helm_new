@@ -44,6 +44,7 @@
 
 #define MOTOR_DISTANCE_TO_CENTER 0.2f
 #define CHASSIS_WZ_SET_SCALE 0.0f
+#define GIMBAL_ECD_RANGE 65536
 
 typedef enum
 {
@@ -63,7 +64,7 @@ typedef struct
 	int16_t RC_wz_last;
 	pid_type_def chassis_psi;
   fp32 chassis_follow_gimbal_zero;	
-	
+	fp32 chassis_follow_gimbal_err;	
 	uint8_t chassis_mode;
 	uint8_t chassis_side;
 	uint8_t chassis_direction;
