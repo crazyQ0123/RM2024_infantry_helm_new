@@ -96,7 +96,7 @@ void helm_pid_update()
 		
 		PID_calc(&helm[i].M6020_angle_pid,helm[i].angle_err,0);
 		PID_calc(&helm[i].M6020_speed_pid,helm[i].M6020.speed_rpm,helm[i].M6020_angle_pid.out);
-		PID_calc(&helm[i].M3508_speed_pid,helm[i].M3508.speed_rpm,helm[i].speed_set);
+		PID_calc(&helm[i].M3508_speed_pid,helm[i].M3508.speed_rpm,helm[i].speed_set*arm_cos_f32(helm[i].angle_err));
 	}
 //	Vofa_Send_Data2(helm[0].M6020.ecd,helm[0].angle_err);
 }

@@ -301,7 +301,7 @@ void chassis_solve()
 	chassis_helm.wz=temp_speed_wz;
 	chassis_control.chassis_follow_gimbal_err = limit_pi((chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
 	
-	if(	!(ABS(chassis_control.vx)<50&&ABS(chassis_control.vy)<50) &&
+	if(	(ABS(chassis_control.vx)>50||ABS(chassis_control.vy)>50) &&
 			!chassis_follow_gimbal_changing &&
 			!KEY_SHIFT &&
 			rc_ctrl.rc.s[1]==RC_SW_UP &&
@@ -318,6 +318,8 @@ void chassis_solve()
 			
 		PID_calc(&chassis_control.chassis_psi,ang_err,0);
 		chassis_helm.wz=chassis_control.chassis_psi.out;
+		if(sqrt(temp_speed_vx*temp_speed_vx+temp_speed_vy*temp_speed_vy)/3000.0f<1)
+			chassis_helm.wz*=sqrt(temp_speed_vx*temp_speed_vx+temp_speed_vy*temp_speed_vy)/3000.0f;
 	}
 }
 

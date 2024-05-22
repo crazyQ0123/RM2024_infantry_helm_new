@@ -17,6 +17,7 @@
 
 /* Private define ------------------------------------------------------------*/
 #define Max(a,b) ((a) > (b) ? (a) : (b))
+#define UI_UPDATE_DELAY 80
 //#define Robot_ID_Current Robot_ID_Blue_Infantry3
 //#define Robot_ID_Current Robot_ID_Red_Infantry3
 /* Private variables ---------------------------------------------------------*/
@@ -150,7 +151,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line(&UI_Graph7.Graphic[5], "006", UI_Graph_Add, 0, UI_Color_Green, 5,  959,   y02,  960,   y02); //第二行中心点
 			UI_Draw_Line(&UI_Graph7.Graphic[6], "007", UI_Graph_Add, 0, UI_Color_Green, 1,  989,   y02,  1049,  y02); //第二行左横线
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			
 			//静态UI预绘制 中央标尺2
 			UI_Draw_Line(&UI_Graph7.Graphic[0], "008", UI_Graph_Add, 0, UI_Color_Green, 1,  900,   y03,  940,   y03); //第三行左横线
@@ -161,7 +162,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line(&UI_Graph7.Graphic[5], "013", UI_Graph_Add, 0, UI_Color_Green, 1,  970,   y04,  990,   y04); //第四行右横线
 			UI_Draw_Line(&UI_Graph7.Graphic[6], "014", UI_Graph_Add, 0, UI_Color_Green, 1,  960,y04-10,  960,y04-30); //第四行下竖线
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);		
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			
 			//静态UI预绘制 小陀螺预警线 AUTO_AIM_MODE
 			UI_Draw_Line(&UI_Graph7.Graphic[0], "015", UI_Graph_Add, 0, UI_Color_Yellow, 2,  630,   30,  780,  100);
@@ -172,22 +173,22 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Arc	(&UI_Graph7.Graphic[5], "020", UI_Graph_Add, 0, UI_Color_Yellow, 150, 30, 3, 1880,  550,80,80);		//自瞄模式圆弧
 			UI_Draw_Arc	(&UI_Graph7.Graphic[6], "021", UI_Graph_Add, 0, UI_Color_Yellow, 150, 30, 3, 1880,  550,180,180); //自瞄模式圆弧
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 		
 			//静态UI预绘制 字符串1
 			UI_Draw_String(&UI_String.String, "101", UI_Graph_Add, 1, UI_Color_Green,  26, 6, 3,  50, 785, "Fric  "); //摩擦轮是否开启
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			
 			//静态UI预绘制 字符串2
 			UI_Draw_String(&UI_String.String, "102", UI_Graph_Add, 1, UI_Color_Green,  26, 6, 3,  50, 735, "Lock  "); //自瞄是否锁定
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			
 			//静态UI预绘制 字符串2
 			UI_Draw_String(&UI_String.String, "103", UI_Graph_Add, 1, UI_Color_Green,  26, 6, 3,  665, 172, "Cap   "); //超级电容
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			
 			
 			//动态UI预绘制 图形 and Move_Predict
@@ -199,7 +200,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line  (&UI_Graph7.Graphic[5], "212", UI_Graph_Add, 2, UI_Color_Green, 20, 760, 160, 1160, 160);				 //电容容量图形
 			UI_Draw_Rectangle(&UI_Graph7.Graphic[6], "213", UI_Graph_Add, 2, UI_Color_White, 2,754 , 145, 1164, 175);			 //电容容量图形
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			
 			//动态UI预绘制  shoot 
 			UI_Draw_Rectangle(&UI_Graph5.Graphic[0], "204", UI_Graph_Add, 2, UI_Color_White, 2,	161 , 758, 191,	788);			 	//摩擦轮图形
@@ -211,42 +212,42 @@ void referee_usart_task(void const * argument)
 			UI_attack_flag=1;
 			UI_fric_flag=1;
 			UI_lock_flag=1;
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			
 			//静态UI预绘制 AUTO_AIM_MODE
 			UI_Draw_String(&UI_String.String, "104", UI_Graph_Add, 1, UI_Color_Yellow,  20, 6, 3,  1840, 575, "AIM   "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			UI_Draw_String(&UI_String.String, "105", UI_Graph_Add, 1, UI_Color_Yellow,  20, 6, 3,  1835, 545, "MODE  "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			//动态UI预绘制 AUTO_AIM_MODE
 			UI_Draw_String(&UI_String.String, "106", UI_Graph_Add, 1, UI_Color_White,  20, 6, 3,  1830, 685, "NORM  "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			UI_Draw_String(&UI_String.String, "107", UI_Graph_Add, 1, UI_Color_Black,  20, 6, 3,  1725, 605, "ANTI ");
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			UI_Draw_String(&UI_String.String, "108", UI_Graph_Add, 1, UI_Color_Black,  20, 6, 3,  1720, 505, "SMALL "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			UI_Draw_String(&UI_String.String, "109", UI_Graph_Add, 1, UI_Color_Black,  20, 6, 3,  1845, 430, "BIG  ");
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			UI_AutoAim_Mode_last=0;
 			
 			//静态UI预绘制 SPEED_MODE
 			UI_Draw_String(&UI_String.String, "110", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1680,830, "SPEED_"); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			UI_Draw_String(&UI_String.String, "111", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1820,830, "MODE  "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 			//动态UI预绘制 SPEED_MODE
 			UI_Draw_String(&UI_String.String, "112", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1760,790, "SLOW  "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			UI_Speed_Mode_last=0;
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 		}
 		
 		//动态UI更新 受击反馈
@@ -283,7 +284,7 @@ void referee_usart_task(void const * argument)
 			}
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			UI_attack_flag=1;
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 		}
 		else
 		{
@@ -296,7 +297,7 @@ void referee_usart_task(void const * argument)
 					UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 					UI_attack_direction_Counter=0;
 					UI_attack_flag=0;
-					osDelay(30);
+					osDelay(UI_UPDATE_DELAY);
 				}
 			}
 		}
@@ -315,7 +316,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line(&UI_Graph1.Graphic[0], "205", UI_Operate, 2, UI_Color_Green, 22, 176, 784,  176, 763);			 //摩擦轮图形
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			UI_fric_flag=!UI_fric_flag;
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 		}
 		
 		if(UI_lock_mode	!=	UI_lock_flag ) //动态UI更新 Lock
@@ -332,7 +333,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line(&UI_Graph1.Graphic[0], "207", UI_Operate, 2, UI_Color_Green, 22, 176, 734,  176, 713);			 //自瞄图形
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			UI_lock_flag=!UI_lock_flag;
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 		}
 		
 		if(UI_Speed_Mode!=UI_Speed_Mode_last)
@@ -353,7 +354,7 @@ void referee_usart_task(void const * argument)
 				UI_PushUp_String(&UI_String, Robot_ID_Current);
 			}
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 		}
 		
 		if(UI_AutoAim_Mode_last!=UI_AutoAim_Mode)
@@ -376,7 +377,7 @@ void referee_usart_task(void const * argument)
 					break;
 			}
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 					
 			switch(UI_AutoAim_Mode)
 			{
@@ -396,7 +397,7 @@ void referee_usart_task(void const * argument)
 					break;
 			}
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 		}
 		
 		if(UI_Update_Flag==1)
@@ -430,7 +431,7 @@ void referee_usart_task(void const * argument)
 			
 			UI_Draw_Line(&UI_Graph7.Graphic[6], "212", UI_Graph_invalid, 2, UI_Color_Orange , 20,760 , 160, Capacitance_X, 160);
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
-			osDelay(30);
+			osDelay(UI_UPDATE_DELAY);
 		}
 		
 	}
