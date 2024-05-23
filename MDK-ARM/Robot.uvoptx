@@ -198,7 +198,7 @@
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gimbal_LK</ItemText>
+          <ItemText>gimbal_LK,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
@@ -279,6 +279,11 @@
           <count>23</count>
           <WinNumber>1</WinNumber>
           <ItemText>gimbal_LK[1].ENC_angle_actual</ItemText>
+        </Ww>
+        <Ww>
+          <count>24</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>balance_current</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
