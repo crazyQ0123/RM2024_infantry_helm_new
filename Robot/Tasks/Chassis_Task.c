@@ -69,27 +69,30 @@ static void chassis_vector_set(void)
 	chassis_control.vx=0;
 	chassis_control.vy=0;
 	chassis_control.wz=0;	
+	int8_t rot_sign=-1;
+	if(rc_ctrl.rc.s[1]==RC_SW_UP)
+		rot_sign=1;
 	if(Game_Robot_Status.chassis_power_limit>=100)
 	{
 		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*12;
 		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*12;
-		chassis_control.wz=rc_ctrl.rc.ch[4]>10 ? DEADBAND(rc_ctrl.rc.ch[4],50)*10 : 0;
+		chassis_control.wz=rc_ctrl.rc.ch[4]>10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*10 : 0;
 	}
 	else if(Game_Robot_Status.chassis_power_limit>=80)
 	{
 		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*10;
 		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*10;
-		chassis_control.wz=rc_ctrl.rc.ch[4]>10 ? DEADBAND(rc_ctrl.rc.ch[4],50)*8 : 0;
+		chassis_control.wz=rc_ctrl.rc.ch[4]>10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*8 : 0;
 	}
 	else
 	{
 		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*8;
 		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*8;
-		chassis_control.wz=rc_ctrl.rc.ch[4]>10 ? DEADBAND(rc_ctrl.rc.ch[4],50)*6 : 0;
+		chassis_control.wz=rc_ctrl.rc.ch[4]>10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*6 : 0;
 	}
 //	chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*8;
 //	chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*8;
-//	chassis_control.wz=rc_ctrl.rc.ch[4]>10 ? DEADBAND(rc_ctrl.rc.ch[4],50)*6 : 0;
+//	chassis_control.wz=rc_ctrl.rc.ch[4]>10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*6 : 0;
 }
 
 static void chassis_pc_ctrl(void)

@@ -288,8 +288,27 @@ void Gimbal_Motor_Data_Update(void)
 	gimbal_LK[1].ENC_speed=motor_measure_gimbal[1].speed_rpm;
 	gimbal_LK[1].ENC_angle_actual = gimbal_LK[1].ENC_angle - PITCH_ANGLE_ZERO;
 	
+	//Pitch限位
+	#ifdef INFANTRY_HELM_NEW
+	float ang_err1=ABS(chassis_control.chassis_follow_gimbal_err);
+	float ang_err2=ang_err1;
+	if(ang_err1>PI/2.0f)ang_err1-=PI/2.0f;
+	//舵轮
+	if(ang_err1>PI/4.0f-0.22f&&ang_err1<PI/4.0f+0.22f)Pitch_ang_min=-23.0f;
+	//装甲板
+	else if(ang_err2>PI/2.0f-0.35f&&ang_err2<PI/2.0f+0.35f)Pitch_ang_min=-21.5f;
+	//灯条
+	else if(ang_err2>2.5f&&ang_err2<PI)Pitch_ang_min=11.028f*ang_err2*ang_err2 - 69.514f*ang_err2 + 86.783;
+	//其他
+	else Pitch_ang_min=-28.5f;
+	#endif
+	
+	#ifdef INFANTRY_HELM_OLD
+	Pitch_ang_min=PITCH_ANGLE_SET_MIN;
+	#endif
+	
 	//重力补偿
-	balance_current = GRAVITY_BALANCE(gimbal_LK[1].INS_angle);
+	balance_current = GRAVITY_BALANCE(gimbal_LK[1].ENC_angle_actual);
 }
 
 void Yaw_Motor_Control(void)
@@ -428,6 +447,22 @@ void Pitch_Motor_Control(void)
 //			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].INS_angle, gimbal_LK[1].INS_speed_set);
 //			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
 //		}
+		
+    if(gimbal_LK[1].ENC_angle_actual>PITCH_ANGLE_SET_MAX && gimbal_LK[1].INS_speed_set>-0.1f)
+		{
+			gimbal_LK[1].ENC_angle_actual_set=PITCH_ANGLE_SET_MAX;
+			gimbal_LK[1].INS_angle_set=gimbal_LK[1].INS_angle;
+			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].ENC_angle_actual, gimbal_LK[1].ENC_angle_actual_set);
+			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
+		}
+		else if(gimbal_LK[1].ENC_angle_actual<Pitch_ang_min && gimbal_LK[1].INS_speed_set<0.1f)
+		{
+			gimbal_LK[1].ENC_angle_actual_set=Pitch_ang_min;
+			gimbal_LK[1].INS_angle_set=gimbal_LK[1].INS_angle;
+			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].ENC_angle_actual, gimbal_LK[1].ENC_angle_actual_set);
+			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
+		}
+		
 		PID_calc(&gimbal_LK[1].speed_pid, gimbal_LK[1].INS_speed, gimbal_LK[1].INS_speed_set);
     gimbal_LK[1].give_current = gimbal_LK[1].speed_pid.out + balance_current;
 
