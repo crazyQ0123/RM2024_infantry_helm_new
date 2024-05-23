@@ -65,10 +65,10 @@ float pitch_pid_rate=0.25f;
 #define PITCH_MOTOR_AUTO_AIM_PID_MAX_OUT 3.0f
 #define PITCH_MOTOR_AUTO_AIM_PID_MAX_IOUT 100.0f
 
-#define PITCH_ANGLE_SET_MAX 35.0f
+#define PITCH_ANGLE_SET_MAX 33.0f
 #define PITCH_ANGLE_SET_MIN -24.0f
 
-#define GRAVITY_BALANCE(n)			(250)
+#define GRAVITY_BALANCE(n)			(250*arm_cos_f32((n)*ANGLE_TO_RAD))
 #define PITCH_ANGLE_ZERO 318.0f
 #endif
 

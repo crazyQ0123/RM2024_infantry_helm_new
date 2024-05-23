@@ -48,7 +48,7 @@ float   UI_Gimbal_Pitch = 0.0f; //云台Pitch轴角度
 float   UI_Gimbal_Roll = 0.0f; //云台Pitch轴角度
 float   UI_Gimbal_Yaw   = 0.0f; //云台Yaw轴角度
 float   UI_Chassis_Follow_Gimbal_Angle=0.0f;//底盘跟随云台角度
-uint8_t UI_attack_direction=0;			//受击反馈方向
+int16_t UI_attack_direction=0;			//受击反馈方向
 uint8_t UI_attack_flag=0;						//受击反馈图形是否已绘制
 uint16_t UI_attack_direction_Counter=0;	//受击反馈图形删除延时
 uint8_t UI_HP_deduction_reason=0;
@@ -207,7 +207,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line		 (&UI_Graph5.Graphic[1], "205", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 784,  176, 763);		 	//摩擦轮图形
 			UI_Draw_Rectangle(&UI_Graph5.Graphic[2], "206", UI_Graph_Add, 2, UI_Color_White, 2,	161 , 708, 191,	738);			 	//自瞄图形
 			UI_Draw_Line		 (&UI_Graph5.Graphic[3], "207", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 734,  176, 713);			//自瞄图形
-			UI_Draw_Arc			 (&UI_Graph5.Graphic[4], "208", UI_Graph_Add, 2, UI_Color_Main, 300, 60, 5, 960,  740,100,50);	//受击反馈
+			UI_Draw_Arc			 (&UI_Graph5.Graphic[4], "208", UI_Graph_Add, 2, UI_Color_Orange, 300, 60, 5, 960,  740,100,50);	//受击反馈
 			UI_PushUp_Graphs(5, &UI_Graph5, Robot_ID_Current);
 			UI_attack_flag=1;
 			UI_fric_flag=1;
@@ -254,7 +254,7 @@ void referee_usart_task(void const * argument)
 		if(UI_Hurt_armor_id>=0&&UI_Hurt_armor_id<=3&&(UI_HP_deduction_reason==0||UI_HP_deduction_reason==5)&&UI_robot_last_HP-UI_robot_current_HP>=2)
 		{
 			UI_attack_direction_Counter=0;
-			UI_attack_direction=(limit_360deg(((chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*360+45))/90+UI_Hurt_armor_id)%4;
+			UI_attack_direction=360-chassis_control.chassis_follow_gimbal_err/PI*180-UI_Hurt_armor_id*90;
 			uint8_t UI_Operate=0;
 			
 			if(UI_attack_flag==0)
@@ -265,23 +265,8 @@ void referee_usart_task(void const * argument)
 			{
 				UI_Operate=UI_Graph_Delete;
 			}
-
-			if(UI_attack_direction==0)				//前
-			{
-				UI_Draw_Arc(&UI_Graph1.Graphic[0], "208", UI_Operate, 2, UI_Color_Main, 300, 60, 5, 960,  740,100,50);
-			}
-			else if(UI_attack_direction==1)		//左
-			{
-				UI_Draw_Arc(&UI_Graph1.Graphic[0], "208", UI_Operate, 2, UI_Color_Main, 210, 330, 5, 760,  540,50,100);
-			}
-			else if(UI_attack_direction==2)		//后
-			{
-				UI_Draw_Arc(&UI_Graph1.Graphic[0], "208", UI_Operate, 2, UI_Color_Main, 120, 240, 5, 960,  340,100,50);
-			}
-			else if(UI_attack_direction==3)		//右
-			{
-				UI_Draw_Arc(&UI_Graph1.Graphic[0], "208", UI_Operate, 2, UI_Color_Main, 30, 150, 5, 1160,  540,50,100);
-			}
+			
+			UI_Draw_Arc(&UI_Graph1.Graphic[0], "208", UI_Operate, 2, UI_Color_Orange, limit_360deg(UI_attack_direction-30), limit_360deg(UI_attack_direction+30), 5, 960,  540,200,200);
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			UI_attack_flag=1;
 			osDelay(UI_UPDATE_DELAY);
@@ -291,9 +276,9 @@ void referee_usart_task(void const * argument)
 			if(UI_attack_flag==1)
 			{
 				UI_attack_direction_Counter++;
-				if(UI_attack_direction_Counter==10)
+				if(UI_attack_direction_Counter==5)
 				{
-					UI_Draw_Arc(&UI_Graph1.Graphic[0], "208", UI_Graph_Delete, 2, UI_Color_Main, 30, 150, 5, 1160,  540,50,100);
+					UI_Draw_Arc(&UI_Graph1.Graphic[0], "208", UI_Graph_Delete, 2, UI_Color_Orange, 30, 150, 5, 1160,  540,50,100);
 					UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 					UI_attack_direction_Counter=0;
 					UI_attack_flag=0;
@@ -408,8 +393,8 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line (&UI_Graph7.Graphic[1], "202", UI_Graph_Change, 2, UI_Color_Green , 1 , 960-300.0f*arm_cos_f32(UI_Gimbal_Roll/180.0f*3.14159f) , 600-300*arm_sin_f32(UI_Gimbal_Roll/180.0f*3.14159f), 
 										960+300*arm_cos_f32(UI_Gimbal_Roll/180.0f*3.14159f), 600+300*arm_sin_f32(UI_Gimbal_Roll/180.0f*3.14159f));
 			
-			UI_Draw_Line(&UI_Graph7.Graphic[2], "209", UI_Graph_Change, 2, UI_Color_White , 2 , UI_Move_Start_X, 0, UI_Move_End_X, UI_Move_End_Y);
-			UI_Draw_Line(&UI_Graph7.Graphic[3], "210", UI_Graph_Change, 2, UI_Color_White , 2 , 1920-UI_Move_Start_X, 0, 1920-UI_Move_End_X, UI_Move_End_Y);
+			UI_Draw_Line(&UI_Graph7.Graphic[2], "209", UI_Graph_Change, 2, UI_Color_White , 3 , UI_Move_Start_X, 0, UI_Move_End_X, UI_Move_End_Y);
+			UI_Draw_Line(&UI_Graph7.Graphic[3], "210", UI_Graph_Change, 2, UI_Color_White , 3 , 1920-UI_Move_Start_X, 0, 1920-UI_Move_End_X, UI_Move_End_Y);
 			/* 超级电容容量 */
 			UI_Capacitance = Max(UI_Capacitance, 5);
 			Capacitance_X  = 760.0f + 4.0f * UI_Capacitance;
