@@ -60,7 +60,7 @@ void helm_pid_init()
 	helm[3].ecd_offset=HELM_OFFSET_3;
 	for(uint8_t i=0;i<4;i++)
 	{
-		PID_init_s(&helm[i].M6020_angle_pid	,0			,250		,0			,1000			,1000		,0);
+		PID_init_s(&helm[i].M6020_angle_pid	,0			,300		,0			,20000			,1000		,0);
 		PID_init_s(&helm[i].M6020_speed_pid	,0			,150		,1			,0			,25000	,10000);
 		PID_init_s(&helm[i].M3508_speed_pid	,1			,10			,1		,0			,16000	,5000);
 	}
@@ -68,6 +68,7 @@ void helm_pid_init()
 		helm[1].angle_set = -45/57.3f;
 		helm[2].angle_set =  45/57.3f;
 		helm[3].angle_set = -45/57.3f;
+	
 }
 
 void helm_pid_update()
@@ -125,6 +126,7 @@ void CAN_Chassis_CMD(CAN_HandleTypeDef* hcan,uint32_t id, int16_t motor1, int16_
 void helm_current_send()
 {
 	CAN_Chassis_CMD(&hcan1,0x200,helm[0].M3508_speed_pid.out,helm[1].M3508_speed_pid.out,helm[2].M3508_speed_pid.out,helm[3].M3508_speed_pid.out);
+//	CAN_Chassis_CMD(&hcan1,0x200,0,0,0,0);
 	vTaskDelay(1);
 	CAN_Chassis_CMD(&hcan2,0x1FF,helm[0].M6020_speed_pid.out,helm[1].M6020_speed_pid.out,helm[2].M6020_speed_pid.out,helm[3].M6020_speed_pid.out);
 	vTaskDelay(1);
@@ -163,17 +165,39 @@ void helm_solve()
 //		helm[3].speed_set = chassis_helm.wz;
 //	}
 //	else
+//	if(chassis_helm.vx!=0||chassis_helm.vy!=0||chassis_helm.wz!=0)
+//	{
+//		helm[0].speed_set = sqrt(pow(chassis_helm.vx+chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy+chassis_helm.wz*sin_45,2.0f));
+//		helm[1].speed_set = sqrt(pow(chassis_helm.vx-chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy+chassis_helm.wz*sin_45,2.0f));
+//		helm[2].speed_set = sqrt(pow(chassis_helm.vx-chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy-chassis_helm.wz*sin_45,2.0f));
+//		helm[3].speed_set = sqrt(pow(chassis_helm.vx+chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy-chassis_helm.wz*sin_45,2.0f));
+//		
+//		arm_atan2_f32(chassis_helm.vy+chassis_helm.wz*sin_45,chassis_helm.vx+chassis_helm.wz*cos_45,&helm[0].angle_set );
+//		arm_atan2_f32(chassis_helm.vy+chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[1].angle_set );
+//		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[2].angle_set );
+//		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx+chassis_helm.wz*cos_45,&helm[3].angle_set );
+//	}
+//	else
+//	{
+//		helm[0].speed_set = 0;
+//		helm[1].speed_set = 0;
+//		helm[2].speed_set = 0;
+//		helm[3].speed_set = 0;
+//	}
+	if(chassis_control.vx!=0||chassis_control.vy!=0||chassis_control.wz!=0)
+	{
+		arm_atan2_f32(chassis_helm.vy+chassis_helm.wz*sin_45,chassis_helm.vx+chassis_helm.wz*cos_45,&helm[0].angle_set );
+		arm_atan2_f32(chassis_helm.vy+chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[1].angle_set );
+		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[2].angle_set );
+		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx+chassis_helm.wz*cos_45,&helm[3].angle_set );
+	}
+	
 	if(chassis_helm.vx!=0||chassis_helm.vy!=0||chassis_helm.wz!=0)
 	{
 		helm[0].speed_set = sqrt(pow(chassis_helm.vx+chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy+chassis_helm.wz*sin_45,2.0f));
 		helm[1].speed_set = sqrt(pow(chassis_helm.vx-chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy+chassis_helm.wz*sin_45,2.0f));
 		helm[2].speed_set = sqrt(pow(chassis_helm.vx-chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy-chassis_helm.wz*sin_45,2.0f));
 		helm[3].speed_set = sqrt(pow(chassis_helm.vx+chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy-chassis_helm.wz*sin_45,2.0f));
-		
-		arm_atan2_f32(chassis_helm.vy+chassis_helm.wz*sin_45,chassis_helm.vx+chassis_helm.wz*cos_45,&helm[0].angle_set );
-		arm_atan2_f32(chassis_helm.vy+chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[1].angle_set );
-		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[2].angle_set );
-		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx+chassis_helm.wz*cos_45,&helm[3].angle_set );
 	}
 	else
 	{

@@ -84,6 +84,7 @@ extern RC_ctrl_t rc_ctrl_last;
 #define KEYB_FLY					(KEY_X)																	//·ÉÆÂ
 #define KEYB_TALL_STAND		(!KEY_C_LAST && KEY_C)									//Õ¾Á¢
 #define KEYB_JUMP_OVER		(!KEY_G_LAST && KEY_G)									//Ìø
+#define KEYB_ACROSS_TUNNEL  (KEY_F)																//×ê¶´
 
 
 //×ËÌ¬½Ç

@@ -133,7 +133,9 @@ void Dial_Motor_Control(void)
 		if(dial_mode==0)//continue
 		{
 			if(rc_ctrl.mouse.press_r||rc_ctrl .rc .ch [4]>=300)
+			{
 				shoot_m2006[0].speed_set=dial_speed*nuc_receive_data .aim_data_received.target_rate/10 ;
+			}
 			else
 				shoot_m2006[0].speed_set=dial_speed ;
 		}

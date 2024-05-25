@@ -298,7 +298,7 @@ void Gimbal_Motor_Data_Update(void)
 	//装甲板
 	else if(ang_err2>PI/2.0f-0.35f&&ang_err2<PI/2.0f+0.35f)Pitch_ang_min=-21.5f;
 	//灯条
-	else if(ang_err2>2.5f&&ang_err2<PI)Pitch_ang_min=11.028f*ang_err2*ang_err2 - 69.514f*ang_err2 + 86.783;
+	else if(ang_err2>2.5f&&ang_err2<PI)Pitch_ang_min=11.028f*ang_err2*ang_err2 - 69.514f*ang_err2 + 83.483;
 	//其他
 	else Pitch_ang_min=-28.5f;
 	#endif
@@ -313,7 +313,7 @@ void Gimbal_Motor_Data_Update(void)
 
 void Yaw_Motor_Control(void)
 {
-	if((rc_ctrl.mouse.press_r||rc_ctrl.rc.ch[4]<-200)&&nuc_receive_data.aim_data_received.success==1 && !is_valid())
+	if((rc_ctrl.mouse.press_r||rc_ctrl.rc.ch[4]>200)&&nuc_receive_data.aim_data_received.success==1 && !is_valid())
 	{		
 		yaw_angle_err=nuc_receive_data.aim_data_received.yaw-gimbal_LK[0].INS_angle;
 		if(yaw_angle_err>180) yaw_angle_err-=360;
@@ -385,8 +385,20 @@ void Yaw_Motor_Control(void)
 
 void Pitch_Motor_Control(void)
 {
-   if((rc_ctrl.mouse.press_r||rc_ctrl.rc.ch[4]<-200)&&nuc_receive_data.aim_data_received.success==1 && !is_valid())
-    {
+		#ifdef INFANTRY_HELM_NEW
+		if(KEYB_ACROSS_TUNNEL)
+		{
+			gimbal_LK[1].INS_angle_set=-25.6f;
+			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].INS_angle, RAMP_CTRL(gimbal_LK[1].INS_angle,gimbal_LK[1].INS_angle_set,0.4f));
+			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
+			PID_calc(&gimbal_LK[1].speed_pid, gimbal_LK[1].INS_speed, gimbal_LK[1].INS_speed_set);
+			gimbal_LK[1].give_current = gimbal_LK[1].speed_pid.out + balance_current;
+			
+			return;
+		}
+		#endif
+   if((rc_ctrl.mouse.press_r||rc_ctrl.rc.ch[4]>200)&&nuc_receive_data.aim_data_received.success==1 && !is_valid())
+   {
         pitch_angle_err = nuc_receive_data.aim_data_received.pitch - gimbal_LK[1].INS_angle;
         gimbal_LK[1].auto_aim_pid.Kp = pitch_pid_rate / (log((fabs(pitch_angle_err)) + 1.1f));
         if(gimbal_LK[1].auto_aim_pid.Kp > 20.0f) gimbal_LK[1].auto_aim_pid.Kp = 20.0f;
@@ -434,19 +446,6 @@ void Pitch_Motor_Control(void)
             gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
         }
     }
-
-//    if(gimbal_LK[1].ENC_angle_actual>PITCH_ANGLE_SET_MAX && gimbal_LK[1].INS_speed_set>0)
-//		{
-//			gimbal_LK[1].INS_angle_set=gimbal_LK[1].INS_angle;
-//			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].INS_angle, gimbal_LK[1].INS_angle_set);
-//			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
-//		}
-//		else if(gimbal_LK[1].ENC_angle_actual<PITCH_ANGLE_SET_MIN && gimbal_LK[1].INS_speed_set<0)
-//		{
-//				gimbal_LK[1].INS_angle_set=gimbal_LK[1].INS_angle;
-//			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].INS_angle, gimbal_LK[1].INS_speed_set);
-//			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
-//		}
 		
     if(gimbal_LK[1].ENC_angle_actual>PITCH_ANGLE_SET_MAX && gimbal_LK[1].INS_speed_set>-0.1f)
 		{
@@ -462,7 +461,6 @@ void Pitch_Motor_Control(void)
 			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].ENC_angle_actual, gimbal_LK[1].ENC_angle_actual_set);
 			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
 		}
-		
 		PID_calc(&gimbal_LK[1].speed_pid, gimbal_LK[1].INS_speed, gimbal_LK[1].INS_speed_set);
     gimbal_LK[1].give_current = gimbal_LK[1].speed_pid.out + balance_current;
 
@@ -585,8 +583,10 @@ void Gimbal_Task(void const * argument)
 				CAN_cmd_LK_Pitch(balance_current*0.7f);
 				#endif
 			#endif
-			gimbal_LK[0].INS_angle_set=gimbal_LK[0].INS_angle;
+			gimbal_LK[0].INS_angle_set = gimbal_LK[0].INS_angle;
 			gimbal_LK[1].INS_angle_set = gimbal_LK[1].INS_angle;
+//			PID_clear(&gimbal_LK[0].speed_pid);
+//			PID_clear(&gimbal_LK[1].speed_pid);
 			vTaskDelay(1);
 			CAN_cmd_AMMO(0, 0, 0, 0);
 		}
