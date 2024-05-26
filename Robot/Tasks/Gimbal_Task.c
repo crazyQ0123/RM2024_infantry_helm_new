@@ -13,12 +13,16 @@
 #include "string.h"
 #include "referee.h"
 #include "bsp_usb.h"
+#include "helm_ctrl.h"
 
 #define ANGLE_TO_RAD    0.01745f
 
 #ifndef RAD_TO_ANGLE
 #define RAD_TO_ANGLE 57.295779513082320876798154814105f
 #endif
+
+#define WHEEL_RPM_TO_WZ 1.0f/14.238f*2*PI*60/60/258.0f/2.0f/PI*360/60.0f
+//rpm/14.238f*2*PI*0.06/60/0.2580f/2.0f/PI*360
 
 #define YAW_MOUSE_SEN   0.05f
 #define PITCH_MOUSE_SEN 0.05f
@@ -120,7 +124,6 @@ float pitch_pid_rate=0.25f;
 #define GRAVITY_BALANCE(n)			(0.0018*(n)*(n)*(n) - 0.0649*(n)*(n) + 6.7329*(n) + 38.363)
 #define PITCH_ANGLE_ZERO 117.61f
 #endif
-
 
 
 gimbal_motor_t gimbal_LK[2];
@@ -378,7 +381,7 @@ void Yaw_Motor_Control(void)
 		}
 	}
 
-	PID_calc(&gimbal_LK[0].speed_pid,gimbal_LK[0].INS_speed,gimbal_LK[0].INS_speed_set);
+	PID_calc(&gimbal_LK[0].speed_pid,gimbal_LK[0].INS_speed,gimbal_LK[0].INS_speed_set-chassis_helm.wz*WHEEL_RPM_TO_WZ+nuc_receive_data.aim_data_received.Omega_yaw);
 	gimbal_LK[0].give_current=gimbal_LK[0].speed_pid.out;
 }
 
@@ -461,7 +464,7 @@ void Pitch_Motor_Control(void)
 			PID_calc(&gimbal_LK[1].angle_pid, gimbal_LK[1].ENC_angle_actual, gimbal_LK[1].ENC_angle_actual_set);
 			gimbal_LK[1].INS_speed_set = gimbal_LK[1].angle_pid.out;
 		}
-		PID_calc(&gimbal_LK[1].speed_pid, gimbal_LK[1].INS_speed, gimbal_LK[1].INS_speed_set);
+		PID_calc(&gimbal_LK[1].speed_pid, gimbal_LK[1].INS_speed, gimbal_LK[1].INS_speed_set+nuc_receive_data.aim_data_received.Omega_pitch);
     gimbal_LK[1].give_current = gimbal_LK[1].speed_pid.out + balance_current;
 
 }

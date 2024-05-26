@@ -146,11 +146,11 @@ void Nuc_data_unpacked()
 					usb_cdc_data.crc_cal=CRC_Calculation(usb_cdc_data.usb_cdc_rx_buf,usb_cdc_data.usb_cdc_rx_len-1);
             if(usb_cdc_data.crc_cal==usb_cdc_data.usb_cdc_rx_buf[usb_cdc_data.usb_cdc_rx_len-1])
 						{
-                uint8_t t[2][4];
+                uint8_t t[4][4];
                 switch (usb_cdc_data.usb_cdc_rx_buf[3])
                 {
                     case AIM_DATA_RECV_ID:
-                        for(int i=0;i<2;i++)
+                        for(int i=0;i<4;i++)
 												{
                             for(int j=0;j<4;j++)
 														{
@@ -159,9 +159,11 @@ void Nuc_data_unpacked()
                         }
                         u8_to_float(t[0],&nuc_receive_data.aim_data_received.yaw);
                         u8_to_float(t[1],&nuc_receive_data.aim_data_received.pitch);
-                        nuc_receive_data.aim_data_received.target_rate=usb_cdc_data.usb_cdc_rx_buf[12];
-                        nuc_receive_data.aim_data_received.target_number=usb_cdc_data.usb_cdc_rx_buf[13];
-                        nuc_receive_data.aim_data_received.success=usb_cdc_data.usb_cdc_rx_buf[14];
+												u8_to_float(t[2],&nuc_receive_data.aim_data_received.Omega_yaw);
+												u8_to_float(t[3],&nuc_receive_data.aim_data_received.Omega_pitch);
+                        nuc_receive_data.aim_data_received.target_rate=usb_cdc_data.usb_cdc_rx_buf[20];
+                        nuc_receive_data.aim_data_received.target_number=usb_cdc_data.usb_cdc_rx_buf[21];
+                        nuc_receive_data.aim_data_received.success=usb_cdc_data.usb_cdc_rx_buf[22];
                         break;
 //                    case CHASSIS_CONTROL_RECV_ID:
 //                        nuc_receive_data.chassis_data_received.forward_speed=(int16_t)(usb_cdc_data.usb_cdc_rx_buf[4] | usb_cdc_data.usb_cdc_rx_buf[5]<<8);

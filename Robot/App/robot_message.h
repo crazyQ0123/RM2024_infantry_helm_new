@@ -15,8 +15,10 @@
 #define GIMBAL_AND_CONFIG_SEND_ID 		0x14
 
 typedef struct{
-	float 											yaw;
-	float 											pitch;
+	float 											yaw;						// бу
+	float 											pitch;					// бу
+	float												Omega_yaw;			// бу/s
+	float												Omega_pitch;		// бу/s
 	uint8_t 										target_rate;
 	uint8_t 										target_number;
 	uint8_t 										success;
