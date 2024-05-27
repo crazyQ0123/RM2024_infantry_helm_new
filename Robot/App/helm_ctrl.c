@@ -60,8 +60,11 @@ void helm_pid_init()
 	helm[3].ecd_offset=HELM_OFFSET_3;
 	for(uint8_t i=0;i<4;i++)
 	{
-		PID_init_s(&helm[i].M6020_angle_pid	,0			,300		,0			,20000			,1000		,0);
-		PID_init_s(&helm[i].M6020_speed_pid	,0			,150		,1			,0			,25000	,10000);
+//		PID_init_s(&helm[i].M6020_angle_pid	,0			,300		,0			,20000			,1000		,0);
+//		PID_init_s(&helm[i].M6020_speed_pid	,0			,150		,1			,0			,25000	,10000);
+//		PID_init_s(&helm[i].M3508_speed_pid	,1			,10			,1		,0			,16000	,5000);
+		PID_init_s(&helm[i].M6020_angle_pid	,0			,350		,0			,200			,1000		,0);
+		PID_init_s(&helm[i].M6020_speed_pid	,0			,150		,30			,0			,25000	,10000);
 		PID_init_s(&helm[i].M3508_speed_pid	,1			,10			,1		,0			,16000	,5000);
 	}
 		helm[0].angle_set =  45/57.3f;
