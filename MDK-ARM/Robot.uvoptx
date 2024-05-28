@@ -243,7 +243,7 @@
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>shoot_m2006</ItemText>
+          <ItemText>shoot_m2006,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
@@ -304,6 +304,36 @@
           <count>28</count>
           <WinNumber>1</WinNumber>
           <ItemText>nuc_receive_data.aim_data_received</ItemText>
+        </Ww>
+        <Ww>
+          <count>29</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Autoaim_Mode</ItemText>
+        </Ww>
+        <Ww>
+          <count>30</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\Robot\../Robot/Tasks/Usb_Task.c\Autoaim_Mode</ItemText>
+        </Ww>
+        <Ww>
+          <count>31</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>b</ItemText>
+        </Ww>
+        <Ww>
+          <count>32</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>cap_data.chassis_power</ItemText>
+        </Ww>
+        <Ww>
+          <count>33</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>wheel</ItemText>
+        </Ww>
+        <Ww>
+          <count>34</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>hel</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -447,7 +477,7 @@
 
   <Group>
     <GroupName>BSP</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1587,7 +1617,7 @@
 
   <Group>
     <GroupName>support</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

@@ -14,16 +14,16 @@
 #include "Usb_Task.h"
 
 
-#define SHOOT_MOTOR_SPEED_PID_KP 8.0f
-#define SHOOT_MOTOR_SPEED_PID_KI 0.3f
+#define SHOOT_MOTOR_SPEED_PID_KP 12.0f//8.0f
+#define SHOOT_MOTOR_SPEED_PID_KI 0.8f//0.3f
 #define SHOOT_MOTOR_SPEED_PID_KD 0.0f
 #define SHOOT_MOTOR_SPEED_PID_MAX_OUT 16000.0f
-#define SHOOT_MOTOR_SPEED_PID_MAX_IOUT 10000.0f
+#define SHOOT_MOTOR_SPEED_PID_MAX_IOUT 8000.0f
 
-#define SHOOT_MOTOR_ANGLE_PID_KP 0.6f
+#define SHOOT_MOTOR_ANGLE_PID_KP 0.3f//0.6f
 #define SHOOT_MOTOR_ANGLE_PID_KI 0.0f
-#define SHOOT_MOTOR_ANGLE_PID_KD 0.8f
-#define SHOOT_MOTOR_ANGLE_PID_MAX_OUT 10000.0f
+#define SHOOT_MOTOR_ANGLE_PID_KD 0.3f//0.8f
+#define SHOOT_MOTOR_ANGLE_PID_MAX_OUT 5000.0f
 #define SHOOT_MOTOR_ANGLE_PID_MAX_IOUT 10000.0f
 
 shoot_motor_t shoot_m2006[1];
@@ -119,7 +119,7 @@ void Dial_Motor_Control(void)
 				else
 					shoot_m2006[0].give_current=3000;
 				vTaskDelay(200);
-				Shoot_Motor_Init();
+//				Shoot_Motor_Init();
 				PID_clear(&shoot_m2006[0].speed_pid);
 				PID_clear(&shoot_m2006[0].angle_pid);
 				dial_stop_cnt=0;

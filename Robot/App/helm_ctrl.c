@@ -64,8 +64,8 @@ void helm_pid_init()
 //		PID_init_s(&helm[i].M6020_speed_pid	,0			,150		,1			,0			,25000	,10000);
 //		PID_init_s(&helm[i].M3508_speed_pid	,1			,10			,1		,0			,16000	,5000);
 		PID_init_s(&helm[i].M6020_angle_pid	,0			,350		,0			,200			,1000		,0);
-		PID_init_s(&helm[i].M6020_speed_pid	,0			,150		,30			,0			,25000	,10000);
-		PID_init_s(&helm[i].M3508_speed_pid	,1			,10			,1		,0			,16000	,5000);
+		PID_init_s(&helm[i].M6020_speed_pid	,0			,130		,20			,0			,25000	,10000);
+		PID_init_s(&helm[i].M3508_speed_pid	,0			,10			,1		,0			,16000	,5000);
 	}
 		helm[0].angle_set =  45/57.3f;
 		helm[1].angle_set = -45/57.3f;
@@ -83,8 +83,7 @@ void helm_pid_update()
 	{
 		if(KEYB_FLY)
 		{
-			helm[i].angle_err = limit_pi((helm[i].M6020.ecd-helm[i].ecd_offset+4096)/1303.797294f+helm[i].angle_set);
-			helm[i].speed_set *= -1;
+			helm[i].angle_err = limit_pi((helm[i].M6020.ecd-helm[i].ecd_offset)/1303.797294f+helm[i].angle_set);
 		}
 		else 
 		{
@@ -101,6 +100,8 @@ void helm_pid_update()
 		PID_calc(&helm[i].M6020_angle_pid,helm[i].angle_err,0);
 		PID_calc(&helm[i].M6020_speed_pid,helm[i].M6020.speed_rpm,helm[i].M6020_angle_pid.out);
 		PID_calc(&helm[i].M3508_speed_pid,helm[i].M3508.speed_rpm,helm[i].speed_set*arm_cos_f32(helm[i].angle_err));
+		helm[i].M3508_given_current=helm[i].M3508_speed_pid.out;
+		helm[i].M6020_given_current=helm[i].M6020_speed_pid.out;
 	}
 //	Vofa_Send_Data2(helm[0].M6020.ecd,helm[0].angle_err);
 }
@@ -128,10 +129,10 @@ void CAN_Chassis_CMD(CAN_HandleTypeDef* hcan,uint32_t id, int16_t motor1, int16_
 
 void helm_current_send()
 {
-	CAN_Chassis_CMD(&hcan1,0x200,helm[0].M3508_speed_pid.out,helm[1].M3508_speed_pid.out,helm[2].M3508_speed_pid.out,helm[3].M3508_speed_pid.out);
+	CAN_Chassis_CMD(&hcan1,0x200,helm[0].M3508_given_current,helm[1].M3508_given_current,helm[2].M3508_given_current,helm[3].M3508_given_current);
 //	CAN_Chassis_CMD(&hcan1,0x200,0,0,0,0);
 	vTaskDelay(1);
-	CAN_Chassis_CMD(&hcan2,0x1FF,helm[0].M6020_speed_pid.out,helm[1].M6020_speed_pid.out,helm[2].M6020_speed_pid.out,helm[3].M6020_speed_pid.out);
+	CAN_Chassis_CMD(&hcan2,0x1FF,helm[0].M6020_given_current,helm[1].M6020_given_current,helm[2].M6020_given_current,helm[3].M6020_given_current);
 	vTaskDelay(1);
 }
 

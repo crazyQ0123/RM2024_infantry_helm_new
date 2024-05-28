@@ -11,6 +11,8 @@ typedef struct
 	pid_type_def M6020_speed_pid;
 	pid_type_def M3508_speed_pid;
 	lpf_data_t M6020_speed_lpf;
+	float M3508_given_current;
+	float M6020_given_current;
 	float ecd_offset;
 	float angle_set;
 	float angle_err;

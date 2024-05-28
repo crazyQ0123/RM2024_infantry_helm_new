@@ -13,10 +13,12 @@ typedef struct
 	float max_power;
 	float actual_power;
 	float buffer_power;
+	
+	uint8_t cap_recieve_flag;
+	uint8_t cap_recieve_count;
 }cap_measure_t;
 
 extern cap_measure_t cap_data;
-extern uint8_t cap_recieve_flag;
 void update_cap(uint8_t * data);
 void CAN_Cap_CMD(float data1,float data2,float data3,float data4);
 

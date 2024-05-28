@@ -15,6 +15,7 @@ void usb_task(void const * argument);
 #define AUTOAIM_MODE_SMALL_ENERGY			0x02		//自瞄模式：小能量机关
 #define AUTOAIM_MODE_BIG_ENERGY				0x03		//自瞄模式：大能量机关
 
+
 extern uint8_t Autoaim_Mode;
 extern nuc_receive_data_t	nuc_receive_data;
  

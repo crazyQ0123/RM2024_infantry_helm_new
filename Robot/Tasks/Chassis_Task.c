@@ -30,9 +30,10 @@
 
 #define NO_JUDGE_TOTAL_CURRENT_LIMIT    64000.0f
 //#define BUFFER_TOTAL_CURRENT_LIMIT      16000.0f
-#define POWER_TOTAL_CURRENT_LIMIT       22000.0f
-#define WARNING_POWER_BUFF  60.0f
-#define POWER_HELM_CURRENT_LIMIT       8000.0f
+#define POWER_TOTAL_CURRENT_LIMIT       60000.0f
+#define WARNING_POWER_BUFF  30.0f
+#define LIMIT_POWER_BUFF  60.0f
+#define POWER_HELM_CURRENT_LIMIT       10000.0f
 
 #define sin_45 0.7071067811865475244f
 #define cos_45 0.7071067811865475244f
@@ -118,7 +119,7 @@ static void chassis_pc_ctrl(void)
 	
 	if(KEYB_ACROSS_TUNNEL)
 	{
-		chassis_control.vx=ADJUST_VX_MAX;
+		chassis_control.vx = ADJUST_VX_MAX;
 		if(KEY_A)
 		{
 			chassis_control.vy = ADJUST_VY_MAX;
@@ -209,14 +210,14 @@ void chassis_power_control()
 	
 	for(uint8_t i=0;i<4;i++)
 	{
-		Helm_current+=0.15f*fabs(helm[i].M6020_speed_pid.out);
+		Helm_current+=0.15f*fabs(helm[i].M6020_given_current);
 	}
 	if(Helm_current>POWER_HELM_CURRENT_LIMIT)
 	{
 		power_scale=POWER_HELM_CURRENT_LIMIT/Helm_current;
 		for(uint8_t i=0;i<4;i++)
 		{
-			helm[i].M6020_speed_pid.out*=power_scale;
+			helm[i].M6020_given_current*=power_scale;
 		}
 		Helm_current=POWER_HELM_CURRENT_LIMIT;
 	}
@@ -224,82 +225,188 @@ void chassis_power_control()
 	
 	for(uint8_t i=0;i<4;i++)
 	{
-		Wheel_current+=fabs(helm[i].M3508_speed_pid.out);
+		Wheel_current+=fabs(helm[i].M3508_given_current);
 	}
 	if(Wheel_current>Wheel_current_limit)
 	{
 		power_scale=Wheel_current_limit/Wheel_current;
 		for(uint8_t i=0;i<4;i++)
 		{
-			helm[i].M3508_speed_pid.out*=power_scale;
+			helm[i].M3508_given_current*=power_scale;
 		}
 	}
-	
 	
 	if(Game_Robot_Status.chassis_power_limit!=0)
 	{
-		power_scale=Power_Heat_Data.buffer_energy/WARNING_POWER_BUFF;
-		for(uint8_t i=0;i<4;i++)
+		if(Power_Heat_Data.buffer_energy<WARNING_POWER_BUFF)
 		{
-			helm[i].M3508_speed_pid.out*=power_scale;
+			power_scale=pow(Power_Heat_Data.buffer_energy/WARNING_POWER_BUFF,3.0f);
+			for(uint8_t i=0;i<4;i++)
+			{
+				helm[i].M3508_given_current*=power_scale;
+			}
 		}
 	}
 }
 
+//void chassis_cap_power_control()
+//{
+//	fp32 total_current_limit=0;
+//	fp32 Wheel_current_limit=0;
+//	fp32 power_scale=0;
+//	fp32 Helm_current=0,Wheel_current=0;
+//	
+//	if(Game_Robot_Status.chassis_power_limit==0)
+//		total_current_limit=NO_JUDGE_TOTAL_CURRENT_LIMIT;
+//	else
+//		total_current_limit=POWER_TOTAL_CURRENT_LIMIT*Game_Robot_Status.chassis_power_limit/100;
+//	
+//	Wheel_current_limit=total_current_limit;
+//	
+//	for(uint8_t i=0;i<4;i++)
+//	{
+//		Helm_current+=0.15f*fabs(helm[i].M6020_speed_pid.out);
+//	}
+//	if(Helm_current>POWER_HELM_CURRENT_LIMIT)
+//	{
+//		power_scale=POWER_HELM_CURRENT_LIMIT/Helm_current;
+//		for(uint8_t i=0;i<4;i++)
+//		{
+//			helm[i].M6020_speed_pid.out*=power_scale;
+//		}
+//		Helm_current=POWER_HELM_CURRENT_LIMIT;
+//	}
+//	Wheel_current_limit-=Helm_current;
+//	
+//	for(uint8_t i=0;i<4;i++)
+//	{
+//		Wheel_current+=fabs(helm[i].M3508_speed_pid.out);
+//	}
+//	
+//	if(Wheel_current>Wheel_current_limit)
+//	{
+//		power_scale=Wheel_current_limit/Wheel_current;
+//		for(uint8_t i=0;i<4;i++)
+//		{
+//			helm[i].M3508_speed_pid.out*=power_scale;
+//		}
+//	}
+//	
+//	
+//	if(cap_data.cap_per<0.3f)
+//	{
+//		power_scale=cap_data.cap_per/0.3f;
+//		for(uint8_t i=0;i<4;i++)
+//		{
+//			helm[i].M3508_speed_pid.out*=pow(power_scale,4);
+//		}
+//	}
+//	cap_data.cap_recieve_count++;
+//	if(cap_data.cap_recieve_count>=250)	//1秒清空超电标志位
+//	{
+//		cap_data.cap_recieve_flag=0;
+//	}
+//}
+
+//void chassis_power_control()
+//{
+//	fp32 power_scale=0;
+//	fp32 Helm_current=0,Helm_current_limit=POWER_HELM_CURRENT_LIMIT;
+//	fp32 power_limit=Game_Robot_Status.chassis_power_limit-10;
+//	if(Power_Heat_Data.chassis_power>power_limit)
+//	{
+//		power_scale=power_limit/Power_Heat_Data.chassis_power;
+//		for(uint8_t i=0;i<4;i++)
+//		{
+//			helm[i].M3508_given_current*=power_scale;
+//			helm[i].M6020_given_current*=power_scale;
+//		}
+//	}
+//	for(uint8_t i=0;i<4;i++)
+//	{
+//		Helm_current+=helm[i].M6020_speed_pid.out;
+//	}
+//	if(Helm_current>Helm_current_limit)
+//	{
+//		power_scale=Helm_current_limit/Helm_current;
+//		for(uint8_t i=0;i<4;i++)
+//		{
+//			helm[i].M6020_given_current*=power_scale;
+//		}
+//	}
+//	
+//	if(Power_Heat_Data.buffer_energy<WARNING_POWER_BUFF)
+//	{
+//		power_scale=pow((fp32)Power_Heat_Data.buffer_energy/LIMIT_POWER_BUFF,2.0f);
+//		for(uint8_t i=0;i<4;i++)
+//		{
+//			helm[i].M3508_given_current*=power_scale;
+//		}
+//	}
+//}
 
 void chassis_cap_power_control()
 {
-	fp32 total_current_limit=0;
-	fp32 Wheel_current_limit=0;
 	fp32 power_scale=0;
-	fp32 Helm_current=0,Wheel_current=0;
-	
-	if(Game_Robot_Status.chassis_power_limit==0)
-		total_current_limit=NO_JUDGE_TOTAL_CURRENT_LIMIT;
-	else
-		total_current_limit=POWER_TOTAL_CURRENT_LIMIT*Game_Robot_Status.chassis_power_limit/100;
-	
-	Wheel_current_limit=total_current_limit;
-	
-	for(uint8_t i=0;i<4;i++)
+	fp32 Helm_current=0;
+	fp32 Helm_current_limit=POWER_HELM_CURRENT_LIMIT;
+	fp32 power_limit=DATA_LIMIT(Game_Robot_Status.chassis_power_limit*1.4,0,150);
+
+	if(cap_data.chassis_power>power_limit)
 	{
-		Helm_current+=0.15f*fabs(helm[i].M6020_speed_pid.out);
-	}
-	if(Helm_current>POWER_HELM_CURRENT_LIMIT)
-	{
-		power_scale=POWER_HELM_CURRENT_LIMIT/Helm_current;
+		power_scale=power_limit/cap_data.chassis_power;
 		for(uint8_t i=0;i<4;i++)
 		{
-			helm[i].M6020_speed_pid.out*=power_scale;
+			helm[i].M3508_given_current*=power_scale;
+			helm[i].M6020_given_current*=power_scale;
 		}
-		Helm_current=POWER_HELM_CURRENT_LIMIT;
 	}
-	Wheel_current_limit-=Helm_current;
-	
 	for(uint8_t i=0;i<4;i++)
 	{
-		Wheel_current+=fabs(helm[i].M3508_speed_pid.out);
+		Helm_current+=0.15*fabs(helm[i].M6020_given_current);
 	}
-	if(Wheel_current>Wheel_current_limit)
+	if(Helm_current>Helm_current_limit)
 	{
-		power_scale=Wheel_current_limit/Wheel_current;
+		power_scale=Helm_current_limit/Helm_current;
 		for(uint8_t i=0;i<4;i++)
 		{
-			helm[i].M3508_speed_pid.out*=power_scale;
+			helm[i].M6020_given_current*=power_scale;
 		}
 	}
-	
-	
+		
+	if(cap_data.cap_per<0.5f)
+	{
+		power_scale=cap_data.cap_per/0.5f;
+		for(uint8_t i=0;i<4;i++)
+		{
+			helm[i].M3508_given_current*=power_scale;
+		}
+	}
+
 	if(cap_data.cap_per<0.3f)
 	{
-		power_scale=cap_data.cap_per/0.3f;
+		power_scale=pow(cap_data.cap_per/0.3f,2.0f);
 		for(uint8_t i=0;i<4;i++)
 		{
-			helm[i].M3508_speed_pid.out*=pow(power_scale,4);
+			helm[i].M3508_given_current*=power_scale;
 		}
 	}
+	
+	if(Power_Heat_Data.buffer_energy<WARNING_POWER_BUFF)
+	{
+		power_scale=pow(Power_Heat_Data.buffer_energy/WARNING_POWER_BUFF,3.0f);
+		for(uint8_t i=0;i<4;i++)
+		{
+			helm[i].M3508_given_current*=power_scale;
+		}
+	}
+		
+	cap_data.cap_recieve_count++;
+	if(cap_data.cap_recieve_count>=250)	//1秒清空超电标志位
+	{
+		cap_data.cap_recieve_flag=0;
+	}
 }
-
 float ang_offset=6.0f;
 //车体至底盘解算
 void chassis_solve()
@@ -372,19 +479,13 @@ void Chassis_Task(void const * argument)
 		}
 		else
 		{
-			if(KEYB_FLY)	//飞坡
-			{
-				helm_current_send();
-			}
+			//功率限制
+			if(cap_data.cap_recieve_flag==1)
+				chassis_cap_power_control();
 			else
-			{
-				//功率限制
-				if(cap_data.cap_per!=0)
-					chassis_cap_power_control();
-				else
-					chassis_power_control();
-				helm_current_send();
-			}
+				chassis_power_control();
+			
+			helm_current_send();
 		}
 		CAN_Cap_CMD(Game_Robot_Status.chassis_power_limit,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
 		vTaskDelay(2);

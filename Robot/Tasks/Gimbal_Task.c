@@ -14,6 +14,7 @@
 #include "referee.h"
 #include "bsp_usb.h"
 #include "helm_ctrl.h"
+#include "Usb_Task.h"
 
 #define ANGLE_TO_RAD    0.01745f
 
@@ -24,7 +25,7 @@
 #define WHEEL_RPM_TO_WZ 1.0f/14.238f*2*PI*60/60/258.0f/2.0f/PI*360/60.0f
 //rpm/14.238f*2*PI*0.06/60/0.2580f/2.0f/PI*360
 
-#define YAW_MOUSE_SEN   0.05f
+#define YAW_MOUSE_SEN   0.08f
 #define PITCH_MOUSE_SEN 0.05f
 
 #ifdef INFANTRY_HELM_NEW
@@ -50,17 +51,18 @@ float yaw_pid_rate=0.5f;//0.3f
 #define YAW_MOTOR_AUTO_AIM_PID_MAX_OUT 1200.0f
 #define YAW_MOTOR_AUTO_AIM_PID_MAX_IOUT 100.0f
 
+#define YAW_MOTOR_BIG_ENERGY_PID_KP 17.0f
+#define YAW_MOTOR_BIG_ENERGY_PID_KI 0.0f	 //0.17f
+#define YAW_MOTOR_BIG_ENERGY_PID_KD 160.0f
+#define YAW_MOTOR_BIG_ENERGY_PID_MAX_OUT 600.0f
+#define YAW_MOTOR_BIG_ENERGY_PID_MAX_IOUT 500.0f
+
 #define PITCH_MOTOR_SPEED_PID_KP 250.0f
 #define PITCH_MOTOR_SPEED_PID_KI 0.8f
 #define PITCH_MOTOR_SPEED_PID_KD 0.0f
 #define PITCH_MOTOR_SPEED_PID_MAX_OUT 1500.0f
 #define PITCH_MOTOR_SPEED_PID_MAX_IOUT 200.0f
 
-//#define PITCH_MOTOR_ANGLE_PID_KP 0.4f
-//#define PITCH_MOTOR_ANGLE_PID_KI 0.0f
-//#define PITCH_MOTOR_ANGLE_PID_KD 1.0f
-//#define PITCH_MOTOR_ANGLE_PID_MAX_OUT 200.0f
-//#define PITCH_MOTOR_ANGLE_PID_MAX_IOUT 0.0f
 #define PITCH_MOTOR_ANGLE_PID_KP 0.3f
 #define PITCH_MOTOR_ANGLE_PID_KI 0.0f
 #define PITCH_MOTOR_ANGLE_PID_KD 0.5f
@@ -73,6 +75,12 @@ float pitch_pid_rate=0.25f;
 #define PITCH_MOTOR_AUTO_AIM_PID_KD 0.0f
 #define PITCH_MOTOR_AUTO_AIM_PID_MAX_OUT 300.0f
 #define PITCH_MOTOR_AUTO_AIM_PID_MAX_IOUT 100.0f
+
+#define PITCH_MOTOR_BIG_ENERGY_PID_KP 0.2f
+#define PITCH_MOTOR_BIG_ENERGY_PID_KI 0.0f	 //0.17f
+#define PITCH_MOTOR_BIG_ENERGY_PID_KD 0.0f
+#define PITCH_MOTOR_BIG_ENERGY_PID_MAX_OUT 150.0f
+#define PITCH_MOTOR_BIG_ENERGY_PID_MAX_IOUT 50.0f
 
 #define PITCH_ANGLE_SET_MAX 33.0f
 #define PITCH_ANGLE_SET_MIN -24.0f
@@ -98,19 +106,25 @@ float pitch_pid_rate=0.25f;
 #define YAW_MOTOR_ANGLE_PID_MAX_IOUT 0.0f
 
 float yaw_pid_rate=0.5f;//0.3f
-#define YAW_MOTOR_AUTO_AIM_PID_KP 35.0f
-#define YAW_MOTOR_AUTO_AIM_PID_KI 0.0f	 //0.17f
-#define YAW_MOTOR_AUTO_AIM_PID_KD 320.0f
-#define YAW_MOTOR_AUTO_AIM_PID_MAX_OUT 1200.0f
-#define YAW_MOTOR_AUTO_AIM_PID_MAX_IOUT 100.0f
+#define YAW_MOTOR_AUTO_AIM_PID_KP 20.0f
+#define YAW_MOTOR_AUTO_AIM_PID_KI 0.0f
+#define YAW_MOTOR_AUTO_AIM_PID_KD 10.0f
+#define YAW_MOTOR_AUTO_AIM_PID_MAX_OUT 600.0f
+#define YAW_MOTOR_AUTO_AIM_PID_MAX_IOUT 0.0f
 
-#define PITCH_MOTOR_SPEED_PID_KP 200.0f	//150.0f
-#define PITCH_MOTOR_SPEED_PID_KI 0.3f
+#define YAW_MOTOR_BIG_ENERGY_PID_KP 17.0f
+#define YAW_MOTOR_BIG_ENERGY_PID_KI 0.0f	 //0.17f
+#define YAW_MOTOR_BIG_ENERGY_PID_KD 160.0f
+#define YAW_MOTOR_BIG_ENERGY_PID_MAX_OUT 600.0f
+#define YAW_MOTOR_BIG_ENERGY_PID_MAX_IOUT 500.0f
+
+#define PITCH_MOTOR_SPEED_PID_KP 300.0f	//150.0f
+#define PITCH_MOTOR_SPEED_PID_KI 4.0f
 #define PITCH_MOTOR_SPEED_PID_KD 0.0f
 #define PITCH_MOTOR_SPEED_PID_MAX_OUT 1500.0f
 #define PITCH_MOTOR_SPEED_PID_MAX_IOUT 200.0f
 
-#define PITCH_MOTOR_ANGLE_PID_KP 0.4f
+#define PITCH_MOTOR_ANGLE_PID_KP 0.3f
 #define PITCH_MOTOR_ANGLE_PID_KI 0.0f
 #define PITCH_MOTOR_ANGLE_PID_KD 1.5f //1.0f
 #define PITCH_MOTOR_ANGLE_PID_MAX_OUT 200.0f
@@ -122,6 +136,12 @@ float pitch_pid_rate=0.25f;
 #define PITCH_MOTOR_AUTO_AIM_PID_KD 0.0f
 #define PITCH_MOTOR_AUTO_AIM_PID_MAX_OUT 3.0f
 #define PITCH_MOTOR_AUTO_AIM_PID_MAX_IOUT 100.0f
+
+#define PITCH_MOTOR_BIG_ENERGY_PID_KP 0.2f
+#define PITCH_MOTOR_BIG_ENERGY_PID_KI 0.0f	 //0.17f
+#define PITCH_MOTOR_BIG_ENERGY_PID_KD 0.0f
+#define PITCH_MOTOR_BIG_ENERGY_PID_MAX_OUT 150.0f
+#define PITCH_MOTOR_BIG_ENERGY_PID_MAX_IOUT 50.0f
 
 #define PITCH_ANGLE_SET_MAX 40.0f
 #define PITCH_ANGLE_SET_MIN -23.0f
@@ -244,10 +264,12 @@ void Gimbal_Motor_Init(void)
 	const static fp32 yaw_motor_speed_pid[3] = {YAW_MOTOR_SPEED_PID_KP, YAW_MOTOR_SPEED_PID_KI, YAW_MOTOR_SPEED_PID_KD};
 	const static fp32 yaw_motor_angle_pid[3] = {YAW_MOTOR_ANGLE_PID_KP, YAW_MOTOR_ANGLE_PID_KI, YAW_MOTOR_ANGLE_PID_KD};
 	const static fp32 yaw_motor_auto_aim_pid[3] = {YAW_MOTOR_AUTO_AIM_PID_KP, YAW_MOTOR_AUTO_AIM_PID_KI, YAW_MOTOR_AUTO_AIM_PID_KD};
+	const static fp32 yaw_motor_big_energy_pid[3] = {YAW_MOTOR_BIG_ENERGY_PID_KP, YAW_MOTOR_BIG_ENERGY_PID_KI, YAW_MOTOR_BIG_ENERGY_PID_KD};
 	
 	const static fp32 pitch_motor_speed_pid[3] = {PITCH_MOTOR_SPEED_PID_KP, PITCH_MOTOR_SPEED_PID_KI, PITCH_MOTOR_SPEED_PID_KD};
 	const static fp32 pitch_motor_angle_pid[3] = {PITCH_MOTOR_ANGLE_PID_KP, PITCH_MOTOR_ANGLE_PID_KI, PITCH_MOTOR_ANGLE_PID_KD};
 	const static fp32 pitch_motor_auto_aim_pid[3] = {PITCH_MOTOR_AUTO_AIM_PID_KP, PITCH_MOTOR_AUTO_AIM_PID_KI, PITCH_MOTOR_AUTO_AIM_PID_KD};
+	const static fp32 pitch_motor_big_energy_pid[3] = {PITCH_MOTOR_BIG_ENERGY_PID_KP, PITCH_MOTOR_BIG_ENERGY_PID_KI, PITCH_MOTOR_BIG_ENERGY_PID_KD};
 	
 	for(uint8_t i=0;i<2;i++)
 	{
@@ -265,10 +287,12 @@ void Gimbal_Motor_Init(void)
 	PID_init(&gimbal_LK[0].speed_pid,PID_POSITION,yaw_motor_speed_pid,YAW_MOTOR_SPEED_PID_MAX_OUT,YAW_MOTOR_SPEED_PID_MAX_IOUT);
 	PID_init(&gimbal_LK[0].angle_pid,PID_POSITION,yaw_motor_angle_pid,YAW_MOTOR_ANGLE_PID_MAX_OUT,YAW_MOTOR_ANGLE_PID_MAX_IOUT);
 	PID_init(&gimbal_LK[0].auto_aim_pid,PID_POSITION,yaw_motor_auto_aim_pid,YAW_MOTOR_AUTO_AIM_PID_MAX_OUT,YAW_MOTOR_AUTO_AIM_PID_MAX_IOUT);
+	PID_init(&gimbal_LK[0].big_energy_pid,PID_POSITION,yaw_motor_big_energy_pid,YAW_MOTOR_BIG_ENERGY_PID_MAX_OUT,YAW_MOTOR_BIG_ENERGY_PID_MAX_IOUT);
 	
 	PID_init(&gimbal_LK[1].speed_pid,PID_POSITION,pitch_motor_speed_pid,PITCH_MOTOR_SPEED_PID_MAX_OUT,PITCH_MOTOR_SPEED_PID_MAX_IOUT);
 	PID_init(&gimbal_LK[1].angle_pid,PID_POSITION,pitch_motor_angle_pid,PITCH_MOTOR_ANGLE_PID_MAX_OUT,PITCH_MOTOR_ANGLE_PID_MAX_IOUT);	
 	PID_init(&gimbal_LK[1].auto_aim_pid,PID_POSITION,pitch_motor_auto_aim_pid,PITCH_MOTOR_AUTO_AIM_PID_MAX_OUT,PITCH_MOTOR_AUTO_AIM_PID_MAX_IOUT);	
+	PID_init(&gimbal_LK[1].big_energy_pid,PID_POSITION,pitch_motor_big_energy_pid,PITCH_MOTOR_BIG_ENERGY_PID_MAX_OUT,PITCH_MOTOR_BIG_ENERGY_PID_MAX_IOUT);
 }
 
 void Gimbal_Motor_Data_Update(void)
@@ -333,19 +357,29 @@ void Yaw_Motor_Control(void)
 		
 		aim_adjust_yaw += -DATA_LIMIT(rc_ctrl.mouse.x,-500,500)/10.0f * 0.001f;
 		aim_adjust_yaw = DATA_LIMIT(aim_adjust_yaw,-1.5f,1.5f);
-		PID_calc(&gimbal_LK[0].auto_aim_pid,yaw_angle_err,-aim_adjust_yaw);
-		if(ABS(gimbal_LK[0].auto_aim_pid.error[0])>2)
+		if(Autoaim_Mode==2 || Autoaim_Mode==3)
+		{
+			PID_calc(&gimbal_LK[0].big_energy_pid,yaw_angle_err,-aim_adjust_yaw);
 			gimbal_LK[0].INS_speed_set=-gimbal_LK[0].auto_aim_pid.out;
-		else 
-			gimbal_LK[0].INS_speed_set=-gimbal_LK[0].auto_aim_pid.out+nuc_receive_data.aim_data_received.Omega_yaw;
-		gimbal_LK[0].INS_angle_set=nuc_receive_data.aim_data_received.yaw ;
-		yaw_mode=yaw_mode_last=1;
+			gimbal_LK[0].INS_angle_set=nuc_receive_data.aim_data_received.yaw ;
+			yaw_mode=yaw_mode_last=1;
+		}
+		else
+		{
+			PID_calc(&gimbal_LK[0].auto_aim_pid,yaw_angle_err,-aim_adjust_yaw);
+			if(ABS(gimbal_LK[0].auto_aim_pid.error[0])>2)
+				gimbal_LK[0].INS_speed_set=-gimbal_LK[0].auto_aim_pid.out;
+			else 
+				gimbal_LK[0].INS_speed_set=-gimbal_LK[0].auto_aim_pid.out+nuc_receive_data.aim_data_received.Omega_yaw;
+			gimbal_LK[0].INS_angle_set=nuc_receive_data.aim_data_received.yaw ;
+			yaw_mode=yaw_mode_last=1;
+		}
 	}
 	else
 	{
 		yaw_mode_last=yaw_mode;
 		aim_adjust_yaw = 0;
-		if((rc_ctrl.rc.ch[0]>10||rc_ctrl.rc.ch[0]<-10)||(rc_ctrl.mouse.x>1||rc_ctrl.mouse.x<-1))
+		if((rc_ctrl.rc.ch[0]>10||rc_ctrl.rc.ch[0]<-10)||(rc_ctrl.mouse.x>0.5f||rc_ctrl.mouse.x<-0.5f))
 		{			
 			yaw_mode=0;
 		}
@@ -362,10 +396,10 @@ void Yaw_Motor_Control(void)
 
 		if(yaw_mode==0)
 		{
-			if(rc_ctrl.mouse.x>1||rc_ctrl.mouse.x<-1)
+			if(rc_ctrl.mouse.x>0.5f||rc_ctrl.mouse.x<-0.5f)
 			{	
 //				gimbal_LK[0].INS_speed_set=-(float)rc_ctrl.mouse.x*YAW_MOUSE_SEN*0.03f*RAD_TO_ANGLE+gimbal_LK[0].INS_speed_set*0.97f;
-				gimbal_LK[0].INS_speed_set=-(float)rc_ctrl.mouse.x*YAW_MOUSE_SEN*0.1f*RAD_TO_ANGLE+gimbal_LK[0].INS_speed_set*0.9f;
+				gimbal_LK[0].INS_speed_set=-(float)DATA_LIMIT(rc_ctrl.mouse.x*YAW_MOUSE_SEN,-18.0f,18.0f)*0.01f*RAD_TO_ANGLE+gimbal_LK[0].INS_speed_set*0.99f;
 				PID_clear(&gimbal_LK[0].angle_pid);
 			}
 			else
@@ -417,17 +451,27 @@ void Pitch_Motor_Control(void)
 			
 				aim_adjust_pitch += -DATA_LIMIT(rc_ctrl.mouse.y,-500,500)/10.0f * 0.001f;
 				aim_adjust_pitch = DATA_LIMIT(aim_adjust_pitch,-1.5f,1.5f);
-        PID_calc(&gimbal_LK[1].auto_aim_pid, gimbal_LK[1].INS_angle, nuc_receive_data.aim_data_received.pitch + aim_adjust_pitch);
-        gimbal_LK[1].INS_speed_set = gimbal_LK[1].auto_aim_pid.out+nuc_receive_data.aim_data_received.Omega_pitch;
+				if(Autoaim_Mode==2 || Autoaim_Mode==3)
+				{
+					PID_calc(&gimbal_LK[1].big_energy_pid, gimbal_LK[1].INS_angle, nuc_receive_data.aim_data_received.pitch + aim_adjust_pitch);
+					gimbal_LK[1].INS_speed_set = gimbal_LK[1].auto_aim_pid.out;
+					gimbal_LK[1].INS_angle_set = nuc_receive_data.aim_data_received.pitch;
+					yaw_mode = yaw_mode_last = 1;
+				}
+				else 
+				{
+					PID_calc(&gimbal_LK[1].auto_aim_pid, gimbal_LK[1].INS_angle, nuc_receive_data.aim_data_received.pitch + aim_adjust_pitch);
+					gimbal_LK[1].INS_speed_set = gimbal_LK[1].auto_aim_pid.out+nuc_receive_data.aim_data_received.Omega_pitch;
 
-        gimbal_LK[1].INS_angle_set = nuc_receive_data.aim_data_received.pitch;
-        yaw_mode = yaw_mode_last = 1;
+					gimbal_LK[1].INS_angle_set = nuc_receive_data.aim_data_received.pitch;
+					yaw_mode = yaw_mode_last = 1;
+				}
     }
     else
     {
 				aim_adjust_pitch = 0;
         pitch_mode_last = pitch_mode;
-        if((rc_ctrl.rc.ch[1] > 5 || rc_ctrl.rc.ch[1] < -5) || (rc_ctrl.mouse.y > 1 || rc_ctrl.mouse.y < -1))
+        if((rc_ctrl.rc.ch[1] > 5 || rc_ctrl.rc.ch[1] < -5) || (rc_ctrl.mouse.y > 0.5f || rc_ctrl.mouse.y < -0.5f))
         {
             pitch_mode = 0;
         }
@@ -440,10 +484,10 @@ void Pitch_Motor_Control(void)
         if(pitch_mode == 0)
         {
             if(rc_ctrl.mouse.y != 0)
-//                gimbal_LK[1].INS_speed_set = -(float)rc_ctrl.mouse.y * PITCH_MOUSE_SEN * 0.25f + gimbal_LK[1].INS_speed_set * 0.75f;
-						gimbal_LK[1].INS_speed_set = -(float)rc_ctrl.mouse.y * PITCH_MOUSE_SEN * 0.5f + gimbal_LK[1].INS_speed_set * 0.5f;
+							gimbal_LK[1].INS_speed_set = -(float)DATA_LIMIT(rc_ctrl.mouse.y * PITCH_MOUSE_SEN,-6.0f,6.0f) * 0.25f + gimbal_LK[1].INS_speed_set * 0.75f;
+//							gimbal_LK[1].INS_speed_set = -(float)rc_ctrl.mouse.y * PITCH_MOUSE_SEN * 0.5f + gimbal_LK[1].INS_speed_set * 0.5f;
             else
-                gimbal_LK[1].INS_speed_set = -(float)rc_ctrl.rc.ch[1] / 660.0f * 2;
+              gimbal_LK[1].INS_speed_set = -(float)rc_ctrl.rc.ch[1] / 660.0f * 2;
 						gimbal_LK[1].INS_angle_set = gimbal_LK[1].INS_angle;
         }
         else if(pitch_mode == 1 && pitch_mode_last == 0)

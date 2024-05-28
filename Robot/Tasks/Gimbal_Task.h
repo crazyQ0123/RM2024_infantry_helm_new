@@ -36,6 +36,7 @@ typedef struct
 	pid_type_def speed_pid;
 	pid_type_def angle_pid;
 	pid_type_def auto_aim_pid;
+	pid_type_def big_energy_pid;
 } gimbal_motor_t;
 
 extern gimbal_motor_t gimbal_LK[2];
