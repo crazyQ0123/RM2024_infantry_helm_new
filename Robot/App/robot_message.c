@@ -44,7 +44,7 @@ void data_update(uint8_t cmd_id)
         case GIMBAL_AND_CONFIG_SEND_ID:
             /*  Update the value of variables here START*/
             nuc_transmit_data.robot_gimbal_data_send.camera_id=0;
-						nuc_transmit_data.robot_gimbal_data_send.is_pressing=rc_ctrl.mouse.press_r;
+						nuc_transmit_data.robot_gimbal_data_send.is_pressing=rc_ctrl.mouse.press_r||(rc_ctrl.rc.ch[4]>200);
             nuc_transmit_data.robot_gimbal_data_send.pitch=PITCH;
             nuc_transmit_data.robot_gimbal_data_send.yaw=YAW;
             nuc_transmit_data.robot_gimbal_data_send.roll=ROLL;
@@ -103,6 +103,10 @@ void send_data_to_nuc(uint8_t cmd_id)
 //            len=nuc_transmit_data.referee_data_send.data_length+5;
 //            memcpy(&usb_cdc_data.usb_cdc_send_buf[4],nuc_transmit_data.referee_data_send.referee_send_data,len-4);
 //            break;
+//				case 0x21:
+//						len=1;
+//						usb_cdc_data.usb_cdc_send_buf[4]=0x01;
+//					break;
         case GIMBAL_AND_CONFIG_SEND_ID:
             len=sizeof(nuc_transmit_data.robot_gimbal_data_send)+4;    
             float_to_u8(&nuc_transmit_data.robot_gimbal_data_send.pitch,t[0]);
