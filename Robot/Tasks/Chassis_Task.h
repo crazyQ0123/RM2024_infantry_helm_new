@@ -61,6 +61,7 @@ typedef struct
 	fp32 v;
 	fp32 psi;
 	fp32 wz;
+	fp32 ramp_vx,ramp_vy,ramp_wz;
 	int16_t RC_wz_last;
 	pid_type_def chassis_psi;
   fp32 chassis_follow_gimbal_zero;	

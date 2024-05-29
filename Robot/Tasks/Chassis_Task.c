@@ -350,7 +350,7 @@ void chassis_cap_power_control()
 	fp32 power_scale=0;
 	fp32 Helm_current=0;
 	fp32 Helm_current_limit=POWER_HELM_CURRENT_LIMIT;
-	fp32 power_limit=DATA_LIMIT(Game_Robot_Status.chassis_power_limit*1.4,0,150);
+	fp32 power_limit=DATA_LIMIT(Game_Robot_Status.chassis_power_limit*1.0,0,150);
 
 	if(cap_data.chassis_power>power_limit)
 	{
@@ -411,19 +411,32 @@ float ang_offset=6.0f;
 //车体至底盘解算
 void chassis_solve()
 {
-	KalmanFilterCalc(&helm_speed[0], chassis_control.vx);
-	KalmanFilterCalc(&helm_speed[1], chassis_control.vy);
-	KalmanFilterCalc(&helm_speed[2], chassis_control.wz);
-	float temp_speed_vx=DEADBAND(helm_speed[0].out,20);
-	float temp_speed_vy=DEADBAND(helm_speed[1].out,20);
-	float temp_speed_wz=DEADBAND(helm_speed[2].out,20);
+//	KalmanFilterCalc(&helm_speed[0], chassis_control.vx);
+//	KalmanFilterCalc(&helm_speed[1], chassis_control.vy);
+//	KalmanFilterCalc(&helm_speed[2], chassis_control.wz);
+//	float temp_speed_vx=DEADBAND(helm_speed[0].out,20);
+//	float temp_speed_vy=DEADBAND(helm_speed[1].out,20);
+//	float temp_speed_wz=DEADBAND(helm_speed[2].out,20);
+//	float ang_err = helm_speed[2].out*ang_offset*0.00001f+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI;
+//	chassis_helm.vx=temp_speed_vx*arm_cos_f32(ang_err)+temp_speed_vy*arm_sin_f32(ang_err);
+//	chassis_helm.vy=-temp_speed_vx*arm_sin_f32(ang_err)+temp_speed_vy*arm_cos_f32(ang_err);
+//	chassis_helm.wz=temp_speed_wz;
+//	chassis_control.chassis_follow_gimbal_err = limit_pi((chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
+	
+	chassis_control.ramp_vx=RAMP(chassis_control.ramp_vx,chassis_control.vx,35.0f);
+	chassis_control.ramp_vy=RAMP(chassis_control.ramp_vy,chassis_control.vy,25.0f);
+	chassis_control.ramp_wz=RAMP(chassis_control.ramp_wz,chassis_control.wz,35.0f);
+	float temp_speed_vx=DEADBAND(chassis_control.ramp_vx,80);
+	float temp_speed_vy=DEADBAND(chassis_control.ramp_vy,80);
+	float temp_speed_wz=DEADBAND(chassis_control.ramp_wz,80);
 	float ang_err = helm_speed[2].out*ang_offset*0.00001f+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI;
 	chassis_helm.vx=temp_speed_vx*arm_cos_f32(ang_err)+temp_speed_vy*arm_sin_f32(ang_err);
 	chassis_helm.vy=-temp_speed_vx*arm_sin_f32(ang_err)+temp_speed_vy*arm_cos_f32(ang_err);
 	chassis_helm.wz=temp_speed_wz;
 	chassis_control.chassis_follow_gimbal_err = limit_pi((chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
+
 	
-	if(	(ABS(chassis_control.vx)>50||ABS(chassis_control.vy)>50) &&
+	if(	(ABS(chassis_control.vx)>100||ABS(chassis_control.vy)>100) &&
 			!chassis_follow_gimbal_changing &&
 			!KEY_SHIFT &&
 			rc_ctrl.rc.s[1]==RC_SW_UP &&

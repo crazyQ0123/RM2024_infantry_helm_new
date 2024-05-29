@@ -26,6 +26,7 @@ extern RC_ctrl_t rc_ctrl_last;
 #define DATA_LIMIT(n,min,max)				((n)>(max) ? (max) : ((n)<(min) ? (min) : (n)))
 #define DEADBAND(n,db)							(ABS(n) >= ABS(db) ? (n) : 0)
 #define RAMP_CTRL(ref,set,acc)	((ref) + DATA_LIMIT((acc),0,1) * ((set) - (ref)))
+#define RAMP(ref,set,add)	((ref)<(set) ? (ref)+(add) : (ref)-(add))
 
 //RMÒ£¿ØÆ÷
 #define RollWheel							rc_ctrl.rc.ch[4]			//Ò£¿ØÆ÷×ó²à¹öÂÖ£¬×ó¡úÓÒ£º660¡ú-660

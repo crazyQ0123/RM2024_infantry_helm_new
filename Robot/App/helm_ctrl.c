@@ -65,7 +65,7 @@ void helm_pid_init()
 //		PID_init_s(&helm[i].M3508_speed_pid	,1			,10			,1		,0			,16000	,5000);
 		PID_init_s(&helm[i].M6020_angle_pid	,0			,350		,0			,200			,1000		,0);
 		PID_init_s(&helm[i].M6020_speed_pid	,0			,130		,20			,0			,25000	,10000);
-		PID_init_s(&helm[i].M3508_speed_pid	,0			,10			,1		,0			,16000	,5000);
+		PID_init_s(&helm[i].M3508_speed_pid	,0			,6			,0.5		,0			,16000	,5000);
 	}
 		helm[0].angle_set =  45/57.3f;
 		helm[1].angle_set = -45/57.3f;
