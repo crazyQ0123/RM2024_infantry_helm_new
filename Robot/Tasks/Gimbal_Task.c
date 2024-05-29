@@ -398,7 +398,7 @@ void Yaw_Motor_Control(void)
 		{
 			if(rc_ctrl.mouse.x>0.5f||rc_ctrl.mouse.x<-0.5f)
 			{	
-//				gimbal_LK[0].INS_speed_set=-(float)rc_ctrl.mouse.x*YAW_MOUSE_SEN*0.03f*RAD_TO_ANGLE+gimbal_LK[0].INS_speed_set*0.97f;
+//				gimbal_LK[0].INS_speed_set=-(float)rc_ctrl.mouse.x*YAW_MOUSE_SEN*0.01f*RAD_TO_ANGLE+gimbal_LK[0].INS_speed_set*0.99f;
 				gimbal_LK[0].INS_speed_set=-(float)DATA_LIMIT(rc_ctrl.mouse.x*YAW_MOUSE_SEN,-30.0f,30.0f)*0.01f*RAD_TO_ANGLE+gimbal_LK[0].INS_speed_set*0.99f;
 				PID_clear(&gimbal_LK[0].angle_pid);
 			}

@@ -64,6 +64,11 @@ uint8_t UI_fric_mode   = 0;     //摩擦轮是否开启
 uint8_t UI_fric_flag		=0;			//摩擦轮图形是否已绘制
 uint8_t UI_lock_mode   = 0;     //自瞄锁定是否开启
 uint8_t UI_lock_flag		=0;			//自瞄锁定图形是否已绘制
+char UI_lock_target_number[6]  ={0};
+char UI_lock_target_HP[6]			 ={0};
+uint16_t UI_chassis_follow_angle=0;
+uint16_t  UI_chassis_positionX=0;
+uint16_t  UI_chassis_positionY=0;
 
 uint16_t UI_Move_Start_X=611;
 uint16_t UI_Move_End_X=850;
@@ -123,6 +128,74 @@ void referee_usart_task(void const * argument)
 		UI_Gimbal_Roll =INS_angle_deg[1];
 		UI_fric_mode	=	fric_state;
 		UI_lock_mode  =	nuc_receive_data.aim_data_received.success;
+		itoa(nuc_receive_data.aim_data_received.target_number%9,UI_lock_target_number,10);
+//		UI_chassis_follow_angle=limit_360deg(45-(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*360);
+//		UI_chassis_positionX=-arm_sin_f32(UI_chassis_follow_angle)*20;
+//		UI_chassis_positionY=arm_cos_f32(UI_chassis_follow_angle)*20;
+		if(Robot_ID_Current<50)
+		{
+				switch(UI_lock_target_number[0])
+				{
+					case 1:
+						itoa(Game_Robot_HP.blue_1_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 2:
+						itoa(Game_Robot_HP.blue_2_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 3:
+						itoa(Game_Robot_HP.blue_3_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 4:
+						itoa(Game_Robot_HP.blue_4_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 5:
+						itoa(Game_Robot_HP.blue_5_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 6:
+						itoa(Game_Robot_HP.blue_7_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 7:
+						itoa(Game_Robot_HP.blue_outpost_HP,UI_lock_target_HP,10);
+						break;
+					case 8:
+						itoa(Game_Robot_HP.blue_base_HP,UI_lock_target_HP,10);
+						break;
+					default:
+						break;
+				}
+		}
+		else
+		{
+			switch(UI_lock_target_number[0])
+			{
+				case 1:
+						itoa(Game_Robot_HP.red_1_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 2:
+						itoa(Game_Robot_HP.red_2_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 3:
+						itoa(Game_Robot_HP.red_3_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 4:
+						itoa(Game_Robot_HP.red_4_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 5:
+						itoa(Game_Robot_HP.red_5_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 6:
+						itoa(Game_Robot_HP.red_7_robot_HP,UI_lock_target_HP,10);
+						break;
+					case 7:
+						itoa(Game_Robot_HP.red_outpost_HP,UI_lock_target_HP,10);
+						break;
+					case 8:
+						itoa(Game_Robot_HP.red_base_HP,UI_lock_target_HP,10);
+						break;
+					default:
+						break;
+			}
+		}
 		UI_HP_deduction_reason=Robot_Hurt.HP_deduction_reason;
 		UI_Hurt_armor_id=Robot_Hurt.armor_id;
 		UI_robot_last_HP=UI_robot_current_HP;
@@ -190,7 +263,6 @@ void referee_usart_task(void const * argument)
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 			
-			
 			//动态UI预绘制 图形 and Move_Predict
 			UI_Draw_Float (&UI_Graph7.Graphic[0], "201", UI_Graph_Add, 2, UI_Color_Yellow, 22, 3, 3, 1355, 632, 0.000f);   //Pitch轴角度
 			UI_Draw_Line  (&UI_Graph7.Graphic[1], "202", UI_Graph_Add, 2, UI_Color_Green , 2 , 960-300, 600, 960+300, 600);//Roll轴角度
@@ -203,15 +275,27 @@ void referee_usart_task(void const * argument)
 			osDelay(UI_UPDATE_DELAY);
 			
 			//动态UI预绘制  shoot 
-			UI_Draw_Rectangle(&UI_Graph5.Graphic[0], "204", UI_Graph_Add, 2, UI_Color_White, 2,	161 , 758, 191,	788);			 	//摩擦轮图形
-			UI_Draw_Line		 (&UI_Graph5.Graphic[1], "205", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 784,  176, 763);		 	//摩擦轮图形
-			UI_Draw_Rectangle(&UI_Graph5.Graphic[2], "206", UI_Graph_Add, 2, UI_Color_White, 2,	161 , 708, 191,	738);			 	//自瞄图形
-			UI_Draw_Line		 (&UI_Graph5.Graphic[3], "207", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 734,  176, 713);			//自瞄图形
-			UI_Draw_Arc			 (&UI_Graph5.Graphic[4], "208", UI_Graph_Add, 2, UI_Color_Orange, 300, 60, 5, 960,  740,100,50);	//受击反馈
-			UI_PushUp_Graphs(5, &UI_Graph5, Robot_ID_Current);
+			UI_Draw_Rectangle(&UI_Graph7.Graphic[0], "203", UI_Graph_Add, 2, UI_Color_White,  2,	161 , 758, 191,	788);			 	//摩擦轮图形
+			UI_Draw_Line		 (&UI_Graph7.Graphic[1], "204", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 784,  176, 763);		 	//摩擦轮图形
+			UI_Draw_Rectangle(&UI_Graph7.Graphic[2], "205", UI_Graph_Add, 2, UI_Color_White,  2,	161 , 708, 191,	738);			 	//自瞄图形
+			UI_Draw_Line		 (&UI_Graph7.Graphic[3], "206", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 734,  176, 713);			//自瞄图形
+			UI_Draw_Rectangle(&UI_Graph2.Graphic[1], "207", UI_Graph_Add, 2, UI_Color_Purple, 2,  681, 743, 1230, 275);	 //自瞄框
+			UI_Draw_Arc			 (&UI_Graph7.Graphic[5], "208", UI_Graph_Add, 2, UI_Color_Orange, 300, 60, 5, 960,  740,100,50);	//受击反馈
+			UI_Draw_Arc			 (&UI_Graph7.Graphic[6], "208", UI_Graph_invalid, 2, UI_Color_Orange, 300, 60, 5, 960,  740,100,50);	//受击反馈
+			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
 			UI_attack_flag=1;
 			UI_fric_flag=1;
 			UI_lock_flag=1;
+			osDelay(UI_UPDATE_DELAY);
+			
+//			//动态UI预绘制 底盘位置
+//			UI_Draw_Line(&UI_Graph2.Graphic[0], "220", UI_Graph_Add, 2, UI_Color_Yellow, 2,  100+UI_chassis_positionX,   650+UI_chassis_positionY,  100-UI_chassis_positionX,   650-UI_chassis_positionY); //第三行左横线
+//			UI_Draw_Line(&UI_Graph2.Graphic[1], "221", UI_Graph_Add, 2, UI_Color_Yellow, 2,  100-UI_chassis_positionY,   650+UI_chassis_positionX,  100+UI_chassis_positionY,   650-UI_chassis_positionX); //第三行中心点
+//			UI_PushUp_Graphs(2, &UI_Graph2, Robot_ID_Current);		
+//			osDelay(UI_UPDATE_DELAY);
+			//动态UI预绘制 底盘位置
+			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Add,2,UI_Color_White,3,960,70,15);
+			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 			
 			//静态UI预绘制 AUTO_AIM_MODE
@@ -247,6 +331,21 @@ void referee_usart_task(void const * argument)
 			UI_Draw_String(&UI_String.String, "112", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1760,790, "SLOW  "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			UI_Speed_Mode_last=0;
+			osDelay(UI_UPDATE_DELAY);
+			
+			//静态UI预绘制 aim_target
+			UI_Draw_String(&UI_String.String, "113", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  900,885, "AIM:  "); 
+			UI_PushUp_String(&UI_String, Robot_ID_Current);
+			osDelay(UI_UPDATE_DELAY);
+			UI_Draw_String(&UI_String.String, "114", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  900,835, "HP:   "); 
+			UI_PushUp_String(&UI_String, Robot_ID_Current);
+			osDelay(UI_UPDATE_DELAY);
+			//动态UI预绘制 aim_target
+			UI_Draw_String(&UI_String.String, "115", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1000,885, "000000"); 
+			UI_PushUp_String(&UI_String, Robot_ID_Current);
+			osDelay(UI_UPDATE_DELAY);
+			UI_Draw_String(&UI_String.String, "116", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1000,835, "000000"); 
+			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 		}
 		
@@ -298,7 +397,7 @@ void referee_usart_task(void const * argument)
 			{
 				UI_Operate=UI_Graph_Delete;
 			}
-			UI_Draw_Line(&UI_Graph1.Graphic[0], "205", UI_Operate, 2, UI_Color_Green, 22, 176, 784,  176, 763);			 //摩擦轮图形
+			UI_Draw_Line(&UI_Graph1.Graphic[0], "204", UI_Operate, 2, UI_Color_Green, 22, 176, 784,  176, 763);			 //摩擦轮图形
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			UI_fric_flag=!UI_fric_flag;
 			osDelay(UI_UPDATE_DELAY);
@@ -310,14 +409,37 @@ void referee_usart_task(void const * argument)
 			if(UI_lock_mode == 1) 
 			{
 				UI_Operate=UI_Graph_Add;
+				UI_Draw_Rectangle(&UI_Graph2.Graphic[1], "207", UI_Graph_Change, 2, UI_Color_Purple, 2,  681, 743, 1230, 275);	 //自瞄框
+				UI_Draw_String(&UI_String.String, "115", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,885, UI_lock_target_number); 
+				UI_PushUp_String(&UI_String, Robot_ID_Current);
+				osDelay(UI_UPDATE_DELAY);
+				UI_Draw_String(&UI_String.String, "116", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,835, UI_lock_target_HP); 
+				UI_PushUp_String(&UI_String, Robot_ID_Current);
+				osDelay(UI_UPDATE_DELAY);
 			}
 			else if(UI_lock_mode == 0) 
 			{
 				UI_Operate=UI_Graph_Delete;
+				UI_Draw_Rectangle(&UI_Graph2.Graphic[1], "207", UI_Graph_Change, 2, UI_Color_Purple, 2,  681, 743, 1230, 275);	 //自瞄框
+				UI_Draw_String(&UI_String.String, "115", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,885, "000000"); 
+				UI_PushUp_String(&UI_String, Robot_ID_Current);
+				osDelay(UI_UPDATE_DELAY);
+				UI_Draw_String(&UI_String.String, "116", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,835, "000000"); 
+				UI_PushUp_String(&UI_String, Robot_ID_Current);
+				osDelay(UI_UPDATE_DELAY);
 			}
-			UI_Draw_Line(&UI_Graph1.Graphic[0], "207", UI_Operate, 2, UI_Color_Green, 22, 176, 734,  176, 713);			 //自瞄图形
-			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
+			UI_Draw_Line(&UI_Graph2.Graphic[0], "206", UI_Operate, 2, UI_Color_Green, 22, 176, 734,  176, 713);			 //自瞄图形
+			UI_PushUp_Graphs(2, &UI_Graph2, Robot_ID_Current);
 			UI_lock_flag=!UI_lock_flag;
+			osDelay(UI_UPDATE_DELAY);
+		}
+		if(UI_lock_flag == 1)
+		{
+			UI_Draw_String(&UI_String.String, "115", UI_Graph_Change, 1, UI_Color_Green,  22, 6, 3,  1000,885, UI_lock_target_number); 
+			UI_PushUp_String(&UI_String, Robot_ID_Current);
+			osDelay(UI_UPDATE_DELAY);
+			UI_Draw_String(&UI_String.String, "116", UI_Graph_Change, 1, UI_Color_Green,  22, 6, 3,  1000,835, UI_lock_target_HP); 
+			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 		}
 		
@@ -385,8 +507,26 @@ void referee_usart_task(void const * argument)
 			osDelay(UI_UPDATE_DELAY);
 		}
 		
+		if(fabs(gimbal_LK[0].ENC_speed)>20&&KEY_SHIFT)
+		{
+			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Change,2,UI_Color_Main,8,960,50,25);
+			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
+			osDelay(UI_UPDATE_DELAY);
+		}
+		else 
+		{
+			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Change,2,UI_Color_White,8,960,50,25);
+			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
+			osDelay(UI_UPDATE_DELAY);
+		}
+		
 		if(UI_Update_Flag==1)
 		{
+//			UI_Draw_Line(&UI_Graph2.Graphic[0], "220", UI_Graph_Change, 2, UI_Color_Yellow, 2,  100+UI_chassis_positionX,   650+UI_chassis_positionY,  100-UI_chassis_positionX,   650-UI_chassis_positionY); //第三行左横线
+//			UI_Draw_Line(&UI_Graph2.Graphic[1], "221", UI_Graph_Change, 2, UI_Color_Yellow, 2,  100-UI_chassis_positionY,   650+UI_chassis_positionX,  100+UI_chassis_positionY,   650-UI_chassis_positionX); //第三行中心点
+//			UI_PushUp_Graphs(2, &UI_Graph2, Robot_ID_Current);		
+//			osDelay(UI_UPDATE_DELAY);
+			
 			/* Pitch轴当前角度 */
 			UI_Draw_Float(&UI_Graph7.Graphic[0], "201", UI_Graph_Change, 2, UI_Color_Yellow, 22, 3, 3, 1355, 632, UI_Gimbal_Pitch);
 			/* Roll轴当前角度 */

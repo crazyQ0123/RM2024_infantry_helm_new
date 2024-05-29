@@ -15,12 +15,12 @@
 #define ADJUST_VX_MAX 660*2
 #define ADJUST_VY_MAX 660*2
 #define ADJUST_WZ_MAX 660*2
-#define SLOW_VX_MAX 660*6
-#define SLOW_VY_MAX 660*6
-#define SLOW_WZ_MAX 660*6
-#define NORMAL_VX_MAX 660*8
-#define NORMAL_VY_MAX 660*8
-#define NORMAL_WZ_MAX 660*8
+#define SLOW_VX_MAX 660*4
+#define SLOW_VY_MAX 660*4
+#define SLOW_WZ_MAX 660*5
+#define NORMAL_VX_MAX 660*7
+#define NORMAL_VY_MAX 660*7
+#define NORMAL_WZ_MAX 660*7
 #define FAST_VX_MAX 660*10
 #define FAST_VY_MAX 660*10
 #define FAST_WZ_MAX 660*10
@@ -351,6 +351,7 @@ void chassis_cap_power_control()
 	fp32 Helm_current=0;
 	fp32 Helm_current_limit=POWER_HELM_CURRENT_LIMIT;
 	fp32 power_limit=DATA_LIMIT(Game_Robot_Status.chassis_power_limit*1.0,0,150);
+
 
 	if(cap_data.chassis_power>power_limit)
 	{
