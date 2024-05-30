@@ -42,7 +42,6 @@
 uint8_t Speed_Mode=0; //0:slow  1:normal  2:fast 
 chassis_control_t chassis_control;
 float chassis_power=0,chassis_power_limit=0,chassis_power_buffer=0;
-kf_data_t helm_speed[3];
 
 
 void CAN_Send_Gimbal_Reset(uint32_t Id)
@@ -412,25 +411,13 @@ float ang_offset=6.0f;
 //车体至底盘解算
 void chassis_solve()
 {
-//	KalmanFilterCalc(&helm_speed[0], chassis_control.vx);
-//	KalmanFilterCalc(&helm_speed[1], chassis_control.vy);
-//	KalmanFilterCalc(&helm_speed[2], chassis_control.wz);
-//	float temp_speed_vx=DEADBAND(helm_speed[0].out,20);
-//	float temp_speed_vy=DEADBAND(helm_speed[1].out,20);
-//	float temp_speed_wz=DEADBAND(helm_speed[2].out,20);
-//	float ang_err = helm_speed[2].out*ang_offset*0.00001f+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI;
-//	chassis_helm.vx=temp_speed_vx*arm_cos_f32(ang_err)+temp_speed_vy*arm_sin_f32(ang_err);
-//	chassis_helm.vy=-temp_speed_vx*arm_sin_f32(ang_err)+temp_speed_vy*arm_cos_f32(ang_err);
-//	chassis_helm.wz=temp_speed_wz;
-//	chassis_control.chassis_follow_gimbal_err = limit_pi((chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
-	
 	chassis_control.ramp_vx=RAMP(chassis_control.ramp_vx,chassis_control.vx,35.0f);
 	chassis_control.ramp_vy=RAMP(chassis_control.ramp_vy,chassis_control.vy,25.0f);
 	chassis_control.ramp_wz=RAMP(chassis_control.ramp_wz,chassis_control.wz,35.0f);
 	float temp_speed_vx=DEADBAND(chassis_control.ramp_vx,80);
 	float temp_speed_vy=DEADBAND(chassis_control.ramp_vy,80);
 	float temp_speed_wz=DEADBAND(chassis_control.ramp_wz,80);
-	float ang_err = helm_speed[2].out*ang_offset*0.00001f+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI;
+	float ang_err = temp_speed_wz*ang_offset*0.00001f+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI;
 	chassis_helm.vx=temp_speed_vx*arm_cos_f32(ang_err)+temp_speed_vy*arm_sin_f32(ang_err);
 	chassis_helm.vy=-temp_speed_vx*arm_sin_f32(ang_err)+temp_speed_vy*arm_cos_f32(ang_err);
 	chassis_helm.wz=temp_speed_wz;
@@ -466,8 +453,6 @@ void Chassis_Task(void const * argument)
 	//vTaskDelete(Chassis_TASKHandle);
 	vTaskDelay(200);	
 	chassis_control.chassis_follow_gimbal_zero=CHASSIS_FOLLOW_GIMBAL_ANGLE_ZERO;
-	for(uint8_t i=0;i<3;i++)
-		Kalman_Init(&helm_speed[i],0.1,100);
 	helm_pid_init();
 //	PID_init_s(&chassis_control.chassis_psi,0,8000,0,48000,10000,0);
 	PID_init_s(&chassis_control.chassis_psi,0,5000,0,5000,10000,0);
