@@ -134,7 +134,7 @@ void referee_usart_task(void const * argument)
 //		UI_chassis_positionY=arm_cos_f32(UI_chassis_follow_angle)*20;
 		if(Robot_ID_Current<50)
 		{
-				switch(UI_lock_target_number[0])
+				switch(nuc_receive_data.aim_data_received.target_number%9)
 				{
 					case 1:
 						itoa(Game_Robot_HP.blue_1_robot_HP,UI_lock_target_HP,10);
@@ -166,7 +166,7 @@ void referee_usart_task(void const * argument)
 		}
 		else
 		{
-			switch(UI_lock_target_number[0])
+			switch(nuc_receive_data.aim_data_received.target_number%9)
 			{
 				case 1:
 						itoa(Game_Robot_HP.red_1_robot_HP,UI_lock_target_HP,10);
@@ -279,7 +279,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line		 (&UI_Graph7.Graphic[1], "204", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 784,  176, 763);		 	//Ä¦²ÁÂÖÍ¼ÐÎ
 			UI_Draw_Rectangle(&UI_Graph7.Graphic[2], "205", UI_Graph_Add, 2, UI_Color_White,  2,	161 , 708, 191,	738);			 	//×ÔÃéÍ¼ÐÎ
 			UI_Draw_Line		 (&UI_Graph7.Graphic[3], "206", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 734,  176, 713);			//×ÔÃéÍ¼ÐÎ
-			UI_Draw_Rectangle(&UI_Graph2.Graphic[1], "207", UI_Graph_Add, 2, UI_Color_Purple, 2,  681, 743, 1230, 275);	 //×ÔÃé¿ò
+			UI_Draw_Rectangle(&UI_Graph7.Graphic[4], "207", UI_Graph_Add, 2, UI_Color_White, 2,  681, 743, 1230, 275);	 //×ÔÃé¿ò
 			UI_Draw_Arc			 (&UI_Graph7.Graphic[5], "208", UI_Graph_Add, 2, UI_Color_Orange, 300, 60, 5, 960,  740,100,50);	//ÊÜ»÷·´À¡
 			UI_Draw_Arc			 (&UI_Graph7.Graphic[6], "208", UI_Graph_invalid, 2, UI_Color_Orange, 300, 60, 5, 960,  740,100,50);	//ÊÜ»÷·´À¡
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
@@ -294,7 +294,7 @@ void referee_usart_task(void const * argument)
 //			UI_PushUp_Graphs(2, &UI_Graph2, Robot_ID_Current);		
 //			osDelay(UI_UPDATE_DELAY);
 			//¶¯Ì¬UIÔ¤»æÖÆ µ×ÅÌÎ»ÖÃ
-			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Add,2,UI_Color_White,3,960,70,15);
+			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Add,2,UI_Color_White,8,960,735,25);
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 			
@@ -420,7 +420,7 @@ void referee_usart_task(void const * argument)
 			else if(UI_lock_mode == 0) 
 			{
 				UI_Operate=UI_Graph_Delete;
-				UI_Draw_Rectangle(&UI_Graph2.Graphic[1], "207", UI_Graph_Change, 2, UI_Color_Purple, 2,  681, 743, 1230, 275);	 //×ÔÃé¿ò
+				UI_Draw_Rectangle(&UI_Graph2.Graphic[1], "207", UI_Graph_Change, 2, UI_Color_White, 2,  681, 743, 1230, 275);	 //×ÔÃé¿ò
 				UI_Draw_String(&UI_String.String, "115", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,885, "000000"); 
 				UI_PushUp_String(&UI_String, Robot_ID_Current);
 				osDelay(UI_UPDATE_DELAY);
@@ -509,13 +509,13 @@ void referee_usart_task(void const * argument)
 		
 		if(fabs(gimbal_LK[0].ENC_speed)>20&&KEY_SHIFT)
 		{
-			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Change,2,UI_Color_Main,8,960,50,25);
+			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Change,2,UI_Color_Main,8,960,735,25);
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 		}
 		else 
 		{
-			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Change,2,UI_Color_White,8,960,50,25);
+			UI_Draw_Circle(UI_Graph1.Graphic,"220",UI_Graph_Change,2,UI_Color_White,8,960,735,25);
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 		}

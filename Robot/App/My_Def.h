@@ -7,8 +7,8 @@
 extern RC_ctrl_t rc_ctrl_last;
 
 //Model Switch
-//#define INFANTRY_HELM_OLD  
-#define INFANTRY_HELM_NEW
+#define INFANTRY_HELM_OLD  
+//#define INFANTRY_HELM_NEW
 //LED
 #define LED_PIN_PORT		GPIOH	
 

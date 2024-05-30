@@ -134,9 +134,9 @@ void Dial_Motor_Control(void)
 		{
 			if(rc_ctrl.mouse.press_r||rc_ctrl .rc .ch [4]>=300)
 			{
-				if(ABS(gimbal_LK[0].auto_aim_pid.error[0])>1.0f)
-					shoot_m2006[0].speed_set=0;
-				else 
+//				if(ABS(gimbal_LK[0].auto_aim_pid.error[0])>1.0f)
+//					shoot_m2006[0].speed_set=0;
+//				else 
 					shoot_m2006[0].speed_set=dial_speed*nuc_receive_data .aim_data_received.target_rate/10 ;
 			}
 			else

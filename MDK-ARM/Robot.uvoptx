@@ -103,7 +103,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>3</nTsel>
+        <nTsel>2</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -164,7 +164,7 @@
           <Type>0</Type>
           <LineNumber>438</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134292208</Address>
+          <Address>134292320</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -351,6 +351,21 @@
           <count>34</count>
           <WinNumber>1</WinNumber>
           <ItemText>hel</ItemText>
+        </Ww>
+        <Ww>
+          <count>35</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>UI_lock_target_HP</ItemText>
+        </Ww>
+        <Ww>
+          <count>36</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>UI_lock_mode</ItemText>
+        </Ww>
+        <Ww>
+          <count>37</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Game_Robot_HP.red_3_robot_HP,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

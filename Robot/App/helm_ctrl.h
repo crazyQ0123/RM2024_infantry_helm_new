@@ -23,6 +23,7 @@ typedef struct
 typedef struct
 {
 	float vx,vy,wz;
+	float vx_set,vy_set,wz_set;
 }chassis_helm_t;
 
 
