@@ -42,7 +42,10 @@
 uint8_t Speed_Mode=0; //0:slow  1:normal  2:fast 
 chassis_control_t chassis_control;
 float chassis_power=0,chassis_power_limit=0,chassis_power_buffer=0;
-
+float RotAngle_Acc=0;
+float SlantAngle_Acc=0;
+float Xretard_Acc=0;
+float Yretard_Acc=0;
 
 void CAN_Send_Gimbal_Reset(uint32_t Id)
 {
@@ -74,18 +77,21 @@ static void chassis_vector_set(void)
 		rot_sign=1;
 	if(Game_Robot_Status.chassis_power_limit>=100)
 	{
+		chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.2f;
 		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*12;
 		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*12;
 		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*10 : 0;
 	}
 	else if(Game_Robot_Status.chassis_power_limit>=80)
 	{
+		chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.0f;
 		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*10;
 		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*10;
 		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*8 : 0;
 	}
 	else
 	{
+		chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*0.8f;
 		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*8;
 		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*8;
 		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*6 : 0;
@@ -104,6 +110,7 @@ static void chassis_pc_ctrl(void)
 	
 	if(KEYB_FLY)	//飞坡模式
 	{
+		chassis_control.power_limit_set=100.0f;
 		chassis_control.vx=FLY_VX_MAX;
 		if(KEY_A)
 		{
@@ -115,37 +122,25 @@ static void chassis_pc_ctrl(void)
 		}
 		return;
 	}
-	
-	if(KEYB_ACROSS_TUNNEL)
-	{
-		chassis_control.vx = ADJUST_VX_MAX;
-		if(KEY_A)
-		{
-			chassis_control.vy = ADJUST_VY_MAX;
-		}
-		if(KEY_D)
-		{
-			chassis_control.vy = -ADJUST_VY_MAX;
-		}
-		return;
-	}
-	
 	else
 	{
 		if(Speed_Mode==0)
 		{
+			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*0.8f;
 			temp_vx = SLOW_VX_MAX;
 			temp_vy = SLOW_VY_MAX;
 			temp_wz = SLOW_WZ_MAX;
 		}
 		else if(Speed_Mode==1)
 		{
+			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.0f;
 			temp_vx = NORMAL_VX_MAX;
 			temp_vy = NORMAL_VY_MAX;
 			temp_wz = NORMAL_WZ_MAX;
 		}
 		else if(Speed_Mode==2)
 		{
+			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.2f;
 			temp_vx = FAST_VX_MAX;
 			temp_vy = FAST_VY_MAX;
 			temp_wz = FAST_WZ_MAX;
@@ -172,11 +167,94 @@ static void chassis_pc_ctrl(void)
 	{
 		chassis_control.wz = temp_wz;
 	}
-	if(KEY_C)
-	{
-		chassis_control.vx = ADJUST_VX_MAX;
-	}
+//	if(KEY_C)
+//	{
+//		chassis_control.vx = ADJUST_VX_MAX;
+//	}
 }
+
+//static void chassis_pc_ctrl(void)
+//{
+//	chassis_control.vx=0;
+//	chassis_control.vy=0;
+//	chassis_control.wz=0;
+//	float temp_vx = 0,temp_vy = 0,temp_wz = 0;
+//	
+//	if(KEYB_FLY)	//飞坡模式
+//	{
+//		chassis_control.vx=FLY_VX_MAX;
+//		if(KEY_A)
+//		{
+//			chassis_control.vy = FLY_VY_MAX;
+//		}
+//		if(KEY_D)
+//		{
+//			chassis_control.vy = -FLY_VY_MAX;
+//		}
+//		return;
+//	}
+//	
+//	if(KEYB_ACROSS_TUNNEL)
+//	{
+//		chassis_control.vx = ADJUST_VX_MAX;
+//		if(KEY_A)
+//		{
+//			chassis_control.vy = ADJUST_VY_MAX;
+//		}
+//		if(KEY_D)
+//		{
+//			chassis_control.vy = -ADJUST_VY_MAX;
+//		}
+//		return;
+//	}
+//	
+//	else
+//	{
+//		if(Speed_Mode==0)
+//		{
+//			temp_vx = SLOW_VX_MAX;
+//			temp_vy = SLOW_VY_MAX;
+//			temp_wz = SLOW_WZ_MAX;
+//		}
+//		else if(Speed_Mode==1)
+//		{
+//			temp_vx = NORMAL_VX_MAX;
+//			temp_vy = NORMAL_VY_MAX;
+//			temp_wz = NORMAL_WZ_MAX;
+//		}
+//		else if(Speed_Mode==2)
+//		{
+//			temp_vx = FAST_VX_MAX;
+//			temp_vy = FAST_VY_MAX;
+//			temp_wz = FAST_WZ_MAX;
+//		}
+//		
+//	}
+//	if(KEY_W)
+//	{
+//		chassis_control.vx = temp_vx;
+//	}
+//	if(KEY_S)
+//	{
+//		chassis_control.vx = -temp_vx;
+//	}
+//	if(KEY_A)
+//	{
+//		chassis_control.vy = temp_vy;
+//	}
+//	if(KEY_D)
+//	{
+//		chassis_control.vy = -temp_vy;
+//	}
+//	if(KEY_SHIFT)
+//	{
+//		chassis_control.wz = temp_wz;
+//	}
+//	if(KEY_C)
+//	{
+//		chassis_control.vx = ADJUST_VX_MAX;
+//	}
+//}
 
 
 /**
@@ -346,55 +424,46 @@ void chassis_power_control()
 
 void chassis_cap_power_control()
 {
+	fp32 Total_current_limit=0;
+	fp32 Wheel_current_limit=0;
 	fp32 power_scale=0;
-	fp32 Helm_current=0;
-	fp32 Helm_current_limit=POWER_HELM_CURRENT_LIMIT;
-	fp32 power_limit=DATA_LIMIT(Game_Robot_Status.chassis_power_limit*1.0,0,150);
-
-
-	if(cap_data.chassis_power>power_limit)
-	{
-		power_scale=power_limit/cap_data.chassis_power;
-		for(uint8_t i=0;i<4;i++)
-		{
-			helm[i].M3508_given_current*=power_scale;
-			helm[i].M6020_given_current*=power_scale;
-		}
-	}
-	for(uint8_t i=0;i<4;i++)
-	{
-		Helm_current+=0.15*fabs(helm[i].M6020_given_current);
-	}
-	if(Helm_current>Helm_current_limit)
-	{
-		power_scale=Helm_current_limit/Helm_current;
-		for(uint8_t i=0;i<4;i++)
-		{
-			helm[i].M6020_given_current*=power_scale;
-		}
-	}
-		
-	if(cap_data.cap_per<0.5f)
-	{
-		power_scale=cap_data.cap_per/0.5f;
-		for(uint8_t i=0;i<4;i++)
-		{
-			helm[i].M3508_given_current*=power_scale;
-		}
-	}
-
+	fp32 Helm_current=0,Wheel_current=0;
+	
 	if(cap_data.cap_per<0.3f)
 	{
-		power_scale=pow(cap_data.cap_per/0.3f,2.0f);
-		for(uint8_t i=0;i<4;i++)
-		{
-			helm[i].M3508_given_current*=power_scale;
-		}
+		power_scale=cap_data.cap_per/0.3;
+		chassis_control.power_limit_set*=power_scale;
 	}
-	
 	if(Power_Heat_Data.buffer_energy<WARNING_POWER_BUFF)
 	{
 		power_scale=pow(Power_Heat_Data.buffer_energy/WARNING_POWER_BUFF,3.0f);
+		chassis_control.power_limit_set*=power_scale;
+	}
+	Total_current_limit=PID_calc(&chassis_control.give_current_pid,cap_data.chassis_power,chassis_control.power_limit_set);
+	
+	for(uint8_t i=0;i<4;i++)
+	{
+		Helm_current+=0.15f*fabs(helm[i].M6020_given_current);
+	}
+	if(Helm_current>POWER_HELM_CURRENT_LIMIT)
+	{
+		power_scale=POWER_HELM_CURRENT_LIMIT/Helm_current;
+		for(uint8_t i=0;i<4;i++)
+		{
+			helm[i].M6020_given_current*=power_scale;
+		}
+		Helm_current=POWER_HELM_CURRENT_LIMIT;
+	}
+	Wheel_current_limit=Total_current_limit-Helm_current;
+	Wheel_current_limit=(Wheel_current_limit>=0) ? Wheel_current_limit : 0;
+	for(uint8_t i=0;i<4;i++)
+	{
+		Wheel_current+=fabs(helm[i].M3508_given_current);
+	}
+	
+	if(Wheel_current>Wheel_current_limit)
+	{
+		power_scale=Wheel_current_limit/Wheel_current;
 		for(uint8_t i=0;i<4;i++)
 		{
 			helm[i].M3508_given_current*=power_scale;
@@ -407,20 +476,71 @@ void chassis_cap_power_control()
 		cap_data.cap_recieve_flag=0;
 	}
 }
-float ang_offset=6.0f;
+
+float acc_IncludedAngle_calc(float x1,float y1,float x2,float y2)
+{
+	float L1=sqrt(fabs((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+	float L2=sqrt(fabs(x1*x1+y1*y1));
+	float L3=sqrt(fabs(x2*x2+y2*y2));
+	if(L1==0||L2==0||L3==0)
+		return 1.0f;
+	else 
+	{
+		float cos_Thet=((L2*L2+L3*L3-L1*L1)/2/L2/L3);
+		if(cos_Thet>=1||cos_Thet<=-1)
+			return 1;
+		else 
+		{
+			float Thet=acosf(cos_Thet);
+			float upper_limit=20.0f/180.0f*PI;
+			if(Thet<upper_limit && (!isnan(Thet)))
+				return 1-Thet/upper_limit;
+			else 
+				return 0;
+		}
+	}
+}
+
+float acc_SlantAngle_calc(float pitch,float roll)
+{
+	float Thet;
+	float tan_Thet;
+	float upper_limit=15.0f/180.0f*PI;
+	arm_sqrt_f32(tanf(pitch/180.0f*PI)*tanf(pitch/180.0f*PI)+tanf(roll/180.0f*PI)*tanf(roll/180.0f*PI),&tan_Thet);
+	arm_atan2_f32(tan_Thet,1,&Thet);
+	chassis_helm.slant_angle=Thet/PI*180;
+	if(Thet<upper_limit)
+		return 1-Thet/upper_limit;
+	else 
+		return 0;
+}
+
+float ang_offset=4.5;
 //车体至底盘解算
 void chassis_solve()
 {
-	chassis_control.ramp_vx=RAMP(chassis_control.ramp_vx,chassis_control.vx,35.0f);
-	chassis_control.ramp_vy=RAMP(chassis_control.ramp_vy,chassis_control.vy,25.0f);
+	chassis_control.ramp_vx=RAMP(chassis_control.ramp_vx,chassis_control.vx,15.0f+20.0f*RotAngle_Acc+60.0f*SlantAngle_Acc+20.0f*Xretard_Acc);
+	chassis_control.ramp_vy=RAMP(chassis_control.ramp_vy,chassis_control.vy,15.0f+20.0f*RotAngle_Acc+60.0f*SlantAngle_Acc+20.0f*Yretard_Acc);
 	chassis_control.ramp_wz=RAMP(chassis_control.ramp_wz,chassis_control.wz,35.0f);
-	float temp_speed_vx=DEADBAND(chassis_control.ramp_vx,80);
-	float temp_speed_vy=DEADBAND(chassis_control.ramp_vy,80);
+	float temp_speed_vx=DEADBAND(chassis_control.ramp_vx,120);
+	float temp_speed_vy=DEADBAND(chassis_control.ramp_vy,120);
 	float temp_speed_wz=DEADBAND(chassis_control.ramp_wz,80);
 	float ang_err = temp_speed_wz*ang_offset*0.00001f+(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI;
 	chassis_helm.vx=temp_speed_vx*arm_cos_f32(ang_err)+temp_speed_vy*arm_sin_f32(ang_err);
 	chassis_helm.vy=-temp_speed_vx*arm_sin_f32(ang_err)+temp_speed_vy*arm_cos_f32(ang_err);
 	chassis_helm.wz=temp_speed_wz;
+	chassis_helm.vx_target=chassis_control.vx*arm_cos_f32(ang_err)+chassis_control.vy*arm_sin_f32(ang_err);
+	chassis_helm.vy_target=-chassis_control.vx*arm_sin_f32(ang_err)+chassis_control.vy*arm_cos_f32(ang_err);
+	if(fabs(chassis_helm.vx_target)<fabs(chassis_helm.vx)||chassis_helm.vx==0)
+		Xretard_Acc=1.0f;
+	else 
+		Xretard_Acc=0.0f;
+	if(fabs(chassis_helm.vy_target)<fabs(chassis_helm.vy)||chassis_helm.vy==0)
+		Yretard_Acc=1.0f;
+	else 
+		Yretard_Acc=0.0f;
+	RotAngle_Acc=acc_IncludedAngle_calc(chassis_helm.vx,chassis_helm.vy,chassis_helm.vx_target,chassis_helm.vy_target);
+	SlantAngle_Acc=acc_SlantAngle_calc(gimbal_LK[1].chassis_angle,ROLL);
 	chassis_control.chassis_follow_gimbal_err = limit_pi((chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*2*PI);
 
 	
@@ -456,6 +576,7 @@ void Chassis_Task(void const * argument)
 	helm_pid_init();
 //	PID_init_s(&chassis_control.chassis_psi,0,8000,0,48000,10000,0);
 	PID_init_s(&chassis_control.chassis_psi,0,5000,0,5000,10000,0);
+	PID_init_s(&chassis_control.give_current_pid,1,200,4,50,65000,10000);
 
 	while(1)
 	{
@@ -467,6 +588,16 @@ void Chassis_Task(void const * argument)
 		{
 			chassis_pc_ctrl();
 		}
+		if(chassis_helm.slant_angle>8.0f)
+		{
+			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.5f;
+		}
+		if(chassis_control.vx==0&&chassis_control.vy==0&&chassis_control.wz==0)
+		{
+			chassis_control.power_limit_set=30.0f;
+			PID_clear(&chassis_control.give_current_pid);
+		}
+		
 		
 		chassis_solve();
 		helm_solve();
@@ -500,6 +631,8 @@ void Chassis_Task(void const * argument)
 				vTaskDelay(1);
 				CAN_Send_Gimbal_Reset(0x142);
 				vTaskDelay(1);
+				if(KEYB_MCU_RESET)
+					break;
 			}
 			#endif
 			__disable_irq();

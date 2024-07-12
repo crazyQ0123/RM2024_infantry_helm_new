@@ -319,6 +319,7 @@ void Gimbal_Motor_Data_Update(void)
 	gimbal_LK[1].ENC_angle=motor_measure_gimbal[1].ecd/((fp32)GIMBAL_ECD_RANGE)*360.0f;
 	gimbal_LK[1].ENC_speed=motor_measure_gimbal[1].speed_rpm;
 	gimbal_LK[1].ENC_angle_actual = gimbal_LK[1].ENC_angle - PITCH_ANGLE_ZERO;
+	gimbal_LK[1].chassis_angle = gimbal_LK[1].INS_angle-gimbal_LK[1].ENC_angle_actual;
 	
 	//PitchÏÞÎ»
 	#ifdef INFANTRY_HELM_NEW
@@ -355,7 +356,7 @@ void Yaw_Motor_Control(void)
 //		if(gimbal_LK[0].auto_aim_pid.Kp>20.0f) gimbal_LK[0].auto_aim_pid.Kp=20.0f;
 //		if(gimbal_LK[0].auto_aim_pid.Kp<0.2f) gimbal_LK[0].auto_aim_pid.Kp=0.2f;
 		
-		aim_adjust_yaw += -DATA_LIMIT(rc_ctrl.mouse.x,-500,500)/10.0f * 0.001f;
+		aim_adjust_yaw += -DATA_LIMIT(rc_ctrl.mouse.x,-500,500)/10.0f * 0.0003f;
 		aim_adjust_yaw = DATA_LIMIT(aim_adjust_yaw,-1.5f,1.5f);
 		if(Autoaim_Mode==2 || Autoaim_Mode==3)
 		{

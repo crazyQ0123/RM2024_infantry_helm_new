@@ -195,7 +195,7 @@ void helm_solve()
 //		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx-chassis_helm.wz*cos_45,&helm[2].angle_set );
 //		arm_atan2_f32(chassis_helm.vy-chassis_helm.wz*sin_45,chassis_helm.vx+chassis_helm.wz*cos_45,&helm[3].angle_set );
 //	}
-	if(chassis_control.vx==0&&chassis_control.vy==0&&chassis_control.wz==0&&(chassis_helm.vx<=20||chassis_helm.vy<=20||chassis_helm.wz<=20))
+	if(chassis_control.vx==0&&chassis_control.vy==0&&chassis_control.wz==0&&(chassis_helm.vx<=80||chassis_helm.vy<=80||chassis_helm.wz<=80))
 	{
 	}
 	else 

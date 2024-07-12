@@ -161,6 +161,7 @@ void referee_usart_task(void const * argument)
 						itoa(Game_Robot_HP.blue_base_HP,UI_lock_target_HP,10);
 						break;
 					default:
+						itoa(0,UI_lock_target_HP,10);
 						break;
 				}
 		}
@@ -168,7 +169,7 @@ void referee_usart_task(void const * argument)
 		{
 			switch(nuc_receive_data.aim_data_received.target_number%9)
 			{
-				case 1:
+					case 1:
 						itoa(Game_Robot_HP.red_1_robot_HP,UI_lock_target_HP,10);
 						break;
 					case 2:
@@ -193,6 +194,7 @@ void referee_usart_task(void const * argument)
 						itoa(Game_Robot_HP.red_base_HP,UI_lock_target_HP,10);
 						break;
 					default:
+						itoa(0,UI_lock_target_HP,10);
 						break;
 			}
 		}

@@ -21,7 +21,7 @@
 #define HELM_OFFSET_1 120
 #define HELM_OFFSET_2 7460
 #define HELM_OFFSET_3 4779
-#define CHASSIS_FOLLOW_GIMBAL_ANGLE_ZERO 17524
+#define CHASSIS_FOLLOW_GIMBAL_ANGLE_ZERO 23291
 #endif
 
 //定义 弧度 转换到 角度的比例
@@ -61,6 +61,8 @@ typedef struct
 	fp32 v;
 	fp32 psi;
 	fp32 wz;
+	fp32 power_limit_set;
+	pid_type_def give_current_pid;
 	fp32 ramp_vx,ramp_vy,ramp_wz;
 	int16_t RC_wz_last;
 	pid_type_def chassis_psi;
