@@ -46,6 +46,30 @@
 #define CHASSIS_WZ_SET_SCALE 0.0f
 #define GIMBAL_ECD_RANGE 65536
 
+#define ADJUST_VX_MAX 660*2
+#define ADJUST_VY_MAX 660*2
+#define ADJUST_WZ_MAX 660*2
+#define SLOW_VX_MAX 660*4
+#define SLOW_VY_MAX 660*4
+#define SLOW_WZ_MAX 660*5
+#define NORMAL_VX_MAX 660*7
+#define NORMAL_VY_MAX 660*7
+#define NORMAL_WZ_MAX 660*7
+#define FAST_VX_MAX 660*10
+#define FAST_VY_MAX 660*10
+#define FAST_WZ_MAX 660*10
+#define FLY_VX_MAX 660*12  //ԼΪ3.5m/s
+#define FLY_VY_MAX 660
+#define CHASSIS_SLOW_ADJ 0.78
+
+#define LIMIT_POWER_BUFF  60.0f
+#define POWER_HELM_CURRENT_LIMIT       10000.0f
+#define FLY_POWER_LIMIT    300.0f
+
+
+#define sin_45 0.7071067811865475244f
+#define cos_45 0.7071067811865475244f
+
 typedef enum
 {
 	CHASSIS_FRONT	= 0,
@@ -57,10 +81,13 @@ typedef enum
 typedef struct
 {
   fp32 vx;
+	fp32 vx_last;
 	fp32 vy;
+	fp32 vy_last;
 	fp32 v;
 	fp32 psi;
 	fp32 wz;
+	fp32 wz_last;
 	fp32 power_limit_set;
 	pid_type_def give_current_pid;
 	fp32 ramp_vx,ramp_vy,ramp_wz;

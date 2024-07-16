@@ -63,8 +63,8 @@ void helm_pid_init()
 //		PID_init_s(&helm[i].M6020_angle_pid	,0			,300		,0			,20000			,1000		,0);
 //		PID_init_s(&helm[i].M6020_speed_pid	,0			,150		,1			,0			,25000	,10000);
 //		PID_init_s(&helm[i].M3508_speed_pid	,1			,10			,1		,0			,16000	,5000);
-		PID_init_s(&helm[i].M6020_angle_pid	,0			,350		,0			,200			,1000		,0);
-		PID_init_s(&helm[i].M6020_speed_pid	,0			,130		,20			,0			,25000	,10000);
+		PID_init_s(&helm[i].M6020_angle_pid	,0			,150		,0			,100			,1000		,0);
+		PID_init_s(&helm[i].M6020_speed_pid	,0			,120		,15			,0			,15000	,7000);
 		PID_init_s(&helm[i].M3508_speed_pid	,0			,6			,0.5		,0			,16000	,5000);
 	}
 		helm[0].angle_set =  45/57.3f;
@@ -132,7 +132,8 @@ void helm_current_send()
 	CAN_Chassis_CMD(&hcan1,0x200,helm[0].M3508_given_current,helm[1].M3508_given_current,helm[2].M3508_given_current,helm[3].M3508_given_current);
 //	CAN_Chassis_CMD(&hcan1,0x200,0,0,0,0);
 	vTaskDelay(1);
-	CAN_Chassis_CMD(&hcan2,0x1FF,helm[0].M6020_given_current,helm[1].M6020_given_current,helm[2].M6020_given_current,helm[3].M6020_given_current);
+	CAN_Chassis_CMD(&hcan2,0x1FE,helm[0].M6020_given_current,helm[1].M6020_given_current,helm[2].M6020_given_current,helm[3].M6020_given_current);
+//	CAN_Chassis_CMD(&hcan2,0x1FE,0,0,0,helm[3].M6020_given_current);
 	vTaskDelay(1);
 }
 
@@ -140,7 +141,7 @@ void helm_current_off()
 {
 	CAN_Chassis_CMD(&hcan1,0x200,0,0,0,0);
 	vTaskDelay(1);
-	CAN_Chassis_CMD(&hcan2,0x1FF,0,0,0,0);
+	CAN_Chassis_CMD(&hcan2,0x1FE,0,0,0,0);
 	vTaskDelay(1);
 }
 
