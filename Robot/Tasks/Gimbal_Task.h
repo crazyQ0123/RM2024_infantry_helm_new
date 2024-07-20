@@ -31,7 +31,7 @@ typedef struct
 	fp32 ENC_speed;
 	fp32 ENC_angle_actual;
 	fp32 ENC_angle_actual_set;
-	fp32 chassis_angle;
+	fp32 chassis_pitch;
   int16_t give_current;
 	
 	pid_type_def speed_pid;

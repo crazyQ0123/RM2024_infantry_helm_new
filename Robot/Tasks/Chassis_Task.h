@@ -12,7 +12,7 @@
 #define HELM_OFFSET_1 4719
 #define HELM_OFFSET_2 7459
 #define HELM_OFFSET_3 2057
-#define CHASSIS_FOLLOW_GIMBAL_ANGLE_ZERO 56479
+#define CHASSIS_FOLLOW_GIMBAL_ANGLE_ZERO 25354
 #endif
 
 //INFANTRY_HELM_OLD
@@ -62,7 +62,7 @@
 #define FLY_VY_MAX 660
 #define CHASSIS_SLOW_ADJ 0.78
 
-#define LIMIT_POWER_BUFF  60.0f
+#define LIMIT_POWER_BUFF  10.0f
 #define POWER_HELM_CURRENT_LIMIT       10000.0f
 #define FLY_POWER_LIMIT    300.0f
 
@@ -90,8 +90,8 @@ typedef struct
 	fp32 wz_last;
 	fp32 power_limit_set;
 	pid_type_def give_current_pid;
+	pid_type_def buffer_energy_pid;
 	fp32 ramp_vx,ramp_vy,ramp_wz;
-	int16_t RC_wz_last;
 	pid_type_def chassis_psi;
   fp32 chassis_follow_gimbal_zero;	
 	fp32 chassis_follow_gimbal_err;	

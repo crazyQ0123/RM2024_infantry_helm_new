@@ -93,6 +93,7 @@ void Fric_Motor_Control(void)
 //		fric_speed=fric_15m;
 //	  FRIC_PWM_R=textspeed;
 //	  FRIC_PWM_L=textspeed;
+
     Fric_PWR(fric_state);
 	
 //	if(shoot_data_t.bullet_speed>bullet_speed_max)

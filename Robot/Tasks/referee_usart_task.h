@@ -40,13 +40,6 @@ extern uint8_t Referee_FIFO_Buffer[REFEREE_FIFO_BUF_LENGTH];
 /* protocol解析包结构体 */
 extern unpack_data_t Referee_Unpack_OBJ;
 
-/* 动态UI数据变量 */
-extern uint8_t UI_AutoAim_Flag; //是否开启自瞄标志位
-extern float   UI_Kalman_Speed; //卡尔曼预测速度
-extern float   UI_Gimbal_Pitch; //云台Pitch轴角度
-extern float   UI_Gimbal_Yaw;   //云台Yaw轴角度
-extern uint8_t UI_Capacitance;  //电容剩余容量
-
 #ifdef __cplusplus
 }
 #endif

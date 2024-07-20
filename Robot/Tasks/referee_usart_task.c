@@ -44,8 +44,9 @@ uint8_t Robot_ID_Current;
 #endif
 uint8_t UI_Update_Flag = 0;    //是否开启自瞄标志位
 float   UI_Kalman_Speed = 0;    //卡尔曼预测速度
-float   UI_Gimbal_Pitch = 0.0f; //云台Pitch轴角度
-float   UI_Gimbal_Roll = 0.0f; //云台Pitch轴角度
+float   UI_Chassis_Pitch = 0.0f; //云台Pitch轴角度
+float		UI_Gimbal_Pitch =0.0f;	//云台Pitch轴角度
+float   UI_Gimbal_Roll = 0.0f; 	//云台Roll轴角度
 float   UI_Gimbal_Yaw   = 0.0f; //云台Yaw轴角度
 float   UI_Chassis_Follow_Gimbal_Angle=0.0f;//底盘跟随云台角度
 int16_t UI_attack_direction=0;			//受击反馈方向
@@ -72,7 +73,7 @@ uint16_t  UI_chassis_positionY=0;
 
 uint16_t UI_Move_Start_X=611;
 uint16_t UI_Move_End_X=850;
-uint16_t UI_Move_End_Y=300;
+uint16_t UI_Move_End_Y=400;
 float UI_Move_K=0;
 
 /* 中央标尺高度变量 */
@@ -124,6 +125,7 @@ void referee_usart_task(void const * argument)
 		#ifndef	Robot_ID_Current
 		Robot_ID_Current = Game_Robot_Status.robot_id;
 		#endif
+		UI_Chassis_Pitch=gimbal_LK[1].ENC_angle_actual;
 		UI_Gimbal_Pitch=gimbal_LK[1].INS_angle;
 		UI_Gimbal_Roll =INS_angle_deg[1];
 		UI_fric_mode	=	fric_state;
@@ -208,12 +210,13 @@ void referee_usart_task(void const * argument)
 		UI_Speed_Mode=Speed_Mode;
     UI_Capacitance=cap_data.cap_per * 100;
 		UI_Chassis_Follow_Gimbal_Angle=chassis_control.chassis_follow_gimbal_zero;
-		if(UI_Gimbal_Pitch<=0&&UI_Gimbal_Pitch>=-25)
-		{
-			UI_Move_Start_X=10.693f*UI_Gimbal_Pitch + 624.75f;
-			UI_Move_K=-0.00005f*UI_Gimbal_Pitch*UI_Gimbal_Pitch*UI_Gimbal_Pitch - 0.0016f*UI_Gimbal_Pitch*UI_Gimbal_Pitch - 0.023f*UI_Gimbal_Pitch + 1.275f;
-			UI_Move_End_X=UI_Move_Start_X+UI_Move_End_Y/UI_Move_K;
-		}
+		if(UI_Chassis_Pitch>3.0f)
+			UI_Chassis_Pitch=3.0f;
+		else if(UI_Chassis_Pitch<-25.0f)
+			UI_Chassis_Pitch=-25.0f;
+		UI_Move_Start_X=0.0037f*pow(UI_Chassis_Pitch,3.0f)+0.0368f*pow(UI_Chassis_Pitch,2.0f)-11.648f*UI_Chassis_Pitch+1326.2f;
+		UI_Move_K=-6E-06f*pow(UI_Chassis_Pitch,3.0f)-0.0003f*pow(UI_Chassis_Pitch,2.0f)+0.0046f*UI_Chassis_Pitch-1.2952f;
+		UI_Move_End_X=UI_Move_Start_X+UI_Move_End_Y/UI_Move_K;
 		/* UI更新 */
 		if(KEYB_FLASH_UI)
 		{
@@ -270,7 +273,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line  (&UI_Graph7.Graphic[1], "202", UI_Graph_Add, 2, UI_Color_Green , 2 , 960-300, 600, 960+300, 600);//Roll轴角度
 			UI_Draw_Line  (&UI_Graph7.Graphic[2], "209", UI_Graph_Add, 2, UI_Color_White , 2 , UI_Move_Start_X, 0, UI_Move_End_X, UI_Move_End_Y);//前进线
 			UI_Draw_Line  (&UI_Graph7.Graphic[3], "210", UI_Graph_Add, 2, UI_Color_White , 2 , 1920-UI_Move_Start_X, 0, 1920-UI_Move_End_X, UI_Move_End_Y);//前进线
-			UI_Draw_Int   (&UI_Graph7.Graphic[4], "211", UI_Graph_Add, 2, UI_Color_Green , 22, 3, 1180,173,100);		 		   //电容容量
+			UI_Draw_Int   (&UI_Graph7.Graphic[4], "211", UI_Graph_Add, 2, UI_Color_Green , 22, 3, 1180,173,100);		 		   //电容容量5
 			UI_Draw_Line  (&UI_Graph7.Graphic[5], "212", UI_Graph_Add, 2, UI_Color_Green, 20, 760, 160, 1160, 160);				 //电容容量图形
 			UI_Draw_Rectangle(&UI_Graph7.Graphic[6], "213", UI_Graph_Add, 2, UI_Color_White, 2,754 , 145, 1164, 175);			 //电容容量图形
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
