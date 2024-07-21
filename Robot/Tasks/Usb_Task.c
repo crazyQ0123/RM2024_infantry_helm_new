@@ -13,9 +13,7 @@ void usb_task(void const * argument)
 	while(1)
 	{
 //		if(KEYB_RECORD)
-//		{
-//			usb_data_send(record_cmd,6);
-//		}
+
 		Nuc_data_unpacked();
 		cmd_id_queue_handle();
 		osDelay(1);
