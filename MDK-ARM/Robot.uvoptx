@@ -260,6 +260,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>Yaw_feedforward</ItemText>
         </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Autoaim_Mode</ItemText>
+        </Ww>
+        <Ww>
+          <count>21</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>yaw_angle_err</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

@@ -161,7 +161,7 @@ int auto_aim_vx=0,auto_aim_vz=0;
 float aim_adjust_yaw,aim_adjust_pitch;
 float MouseX_angle=0,MouseY_angle=0;
 float RcX_angle=0,RcY_angle=0;
-float Yaw_feedforward=0.1f,Pitch_feedforward=0.02f;
+float Yaw_feedforward=0.7f,Pitch_feedforward=0.02f;
 
 uint8_t identify_flag=1;
 fp32 balance_current = 250;
@@ -392,7 +392,8 @@ void Yaw_Motor_Control(void)
 	{
 		if(rc_ctrl.mouse.x!=0)
 		{	
-			MouseX_angle=MouseX_angle*0.95f+rc_ctrl.mouse.x*0.05f;
+//			MouseX_angle=MouseX_angle*0.95f+rc_ctrl.mouse.x*0.05f;
+			MouseX_angle=rc_ctrl.mouse.x;
 			gimbal_LK[0].INS_angle_set-=MouseX_angle*YAW_MOUSE_SEN;
 			gimbal_LK[0].INS_angle_set=limit_180deg(gimbal_LK[0].INS_angle_set);
 		}
