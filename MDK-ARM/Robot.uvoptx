@@ -228,47 +228,37 @@
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>MouseX_angle</ItemText>
+          <ItemText>gimbal_LK[0].INS_speed_set</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gimbal_LK[0].INS_speed_set</ItemText>
+          <ItemText>gimbal_LK[1].INS_speed_set</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>MouseY_angle</ItemText>
+          <ItemText>gimbal_LK[1].angle_pid.out</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gimbal_LK[1].INS_speed_set</ItemText>
+          <ItemText>Yaw_feedforward</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>imbal_LK[1].angle_pid.out</ItemText>
+          <ItemText>Autoaim_Mode</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gimbal_LK[1].angle_pid.out</ItemText>
+          <ItemText>yaw_angle_err</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Yaw_feedforward</ItemText>
-        </Ww>
-        <Ww>
-          <count>20</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Autoaim_Mode</ItemText>
-        </Ww>
-        <Ww>
-          <count>21</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>yaw_angle_err</ItemText>
+          <ItemText>shoot_m2006</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
