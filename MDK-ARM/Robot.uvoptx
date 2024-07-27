@@ -260,6 +260,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>shoot_m2006</ItemText>
         </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>nuc_transmit_data</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
