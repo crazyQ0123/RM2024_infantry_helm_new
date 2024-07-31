@@ -146,7 +146,24 @@ void helm_current_off()
 
 void helm_solve()
 {
-	if(chassis_control.vx==0&&chassis_control.vy==0&&chassis_control.wz==0&&(chassis_helm.vx<=200||chassis_helm.vy<=200||chassis_helm.wz<=200))
+	/*
+	//反解算底盘
+	float helm_vx[4],helm_vy[4];
+	for(uint8_t i=0;i<4;i++)
+	{
+		helm_vx[i]=helm[i].M3508.speed_rpm*cosf(helm[i].angle_err);
+		helm_vy[i]=helm[i].M3508.speed_rpm*sinf(helm[i].angle_err);
+	}
+	helm_vx[0]=-helm_vx[0];
+	helm_vy[0]=-helm_vy[0];
+	helm_vx[3]=-helm_vx[3];
+	helm_vy[3]=-helm_vy[3];
+	chassis_helm.real_vx=(helm_vx[0]+helm_vx[1]+helm_vx[2]+helm_vx[3])/4;
+	chassis_helm.real_vy=(helm_vy[0]+helm_vy[1]+helm_vy[2]+helm_vy[3])/4;
+	chassis_helm.real_wz=sqrt(pow(helm_vx[0]-helm_vx[1]-helm_vx[2]+helm_vx[3],2.0f)+pow(helm_vy[0]+helm_vy[1]-helm_vy[2]-helm_vy[3],2.0f))/4.0f;
+	*/
+	
+	if(chassis_control.vx==0&&chassis_control.vy==0&&chassis_control.wz==0&&(chassis_helm.vx<=300||chassis_helm.vy<=300||chassis_helm.wz<=300))
 	{
 	}
 	else 
@@ -162,6 +179,23 @@ void helm_solve()
 		helm[1].speed_set = sqrt(pow(chassis_helm.vx-chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy+chassis_helm.wz*sin_45,2.0f));
 		helm[2].speed_set = sqrt(pow(chassis_helm.vx-chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy-chassis_helm.wz*sin_45,2.0f));
 		helm[3].speed_set = sqrt(pow(chassis_helm.vx+chassis_helm.wz*cos_45,2.0f)+pow(chassis_helm.vy-chassis_helm.wz*sin_45,2.0f));
+		
+//		//限制3508最大转速
+//		fp32 max_speed=0;
+//		for(uint8_t i=0;i<4;i++)
+//		{
+//			if(fabs(helm[i].speed_set)>max_speed)
+//			{
+//				max_speed=fabs(helm[i].speed_set);
+//			}
+//		}
+//		if(max_speed>8500.0f)
+//		{
+//			for(uint8_t i=0;i<4;i++)
+//			{
+//				helm[i].speed_set*=8500/max_speed;
+//			}
+//		}
 	}
 	else
 	{

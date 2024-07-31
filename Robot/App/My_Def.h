@@ -87,6 +87,7 @@ extern RC_ctrl_t rc_ctrl_last;
 #define KEYB_JUMP_OVER		(!KEY_G_LAST && KEY_G)									//Ìø
 #define KEYB_ACROSS_TUNNEL  (KEY_F)																//×ê¶´
 #define KEYB_RECORD		(KEY_CTRL && KEY_G)													//Â¼ÖÆ
+#define KEYB_FORCED_FIRING 	(KEY_E)																//Ç¿ÖÆ·¢µ¯
 
 //×ËÌ¬½Ç
 #define PITCH							INS_angle_deg[2]			//¸©Ñö½Ç

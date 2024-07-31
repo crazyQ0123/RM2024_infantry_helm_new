@@ -25,6 +25,7 @@ typedef struct
 	float vx,vy,wz;
 	float vx_target,vy_target,wz_target;
 	float slant_angle;
+	float real_vx,real_vy,real_wz;
 }chassis_helm_t;
 
 

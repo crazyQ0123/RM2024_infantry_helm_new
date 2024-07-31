@@ -46,33 +46,33 @@ static void chassis_vector_set(void)
 	int8_t rot_sign=-1;
 	if(rc_ctrl.rc.s[1]==RC_SW_UP)
 		rot_sign=1;
-	if(Game_Robot_Status.chassis_power_limit==0||Game_Robot_Status.chassis_power_limit==65535)
-	{
-		chassis_control.power_limit_set=FLY_POWER_LIMIT;
-		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*12;
-		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*12;
-		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*10 : 0;
-	}
-	else if(Game_Robot_Status.chassis_power_limit>=100)
+	if(Game_Robot_Status.chassis_power_limit>=30&&Game_Robot_Status.chassis_power_limit<=80)
 	{
 		chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.0f;
-		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*10;
-		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*10;
-		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*10 : 0;
+		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*6;
+		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*6;
+		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*6 : 0;
 	}
-	else if(Game_Robot_Status.chassis_power_limit>=80)
+	else if(Game_Robot_Status.chassis_power_limit>80&&Game_Robot_Status.chassis_power_limit<=100)
 	{
 		chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.0f;
 		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*8;
 		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*8;
 		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*8 : 0;
 	}
-	else
+	else if(Game_Robot_Status.chassis_power_limit>100&&Game_Robot_Status.chassis_power_limit<=120)
 	{
 		chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.0f;
-		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*6;
-		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*6;
-		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*6 : 0;
+		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*10;
+		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*10;
+		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*10 : 0;
+	}
+	else
+	{
+		chassis_control.power_limit_set=FLY_POWER_LIMIT;
+		chassis_control.vx=DEADBAND(rc_ctrl.rc.ch[3],50)*12;
+		chassis_control.vy=-DEADBAND(rc_ctrl.rc.ch[2],50)*12;
+		chassis_control.wz=rc_ctrl.rc.ch[4]<-10 ? rot_sign*DEADBAND(rc_ctrl.rc.ch[4],50)*10 : 0;
 	}
 }
 
@@ -141,12 +141,8 @@ static void chassis_pc_ctrl(void)
 	}
 	if(KEY_SHIFT)
 	{
-		chassis_control.wz = temp_wz;
+		chassis_control.wz = -temp_wz;
 	}
-//	if(KEY_C)
-//	{
-//		chassis_control.vx = ADJUST_VX_MAX;
-//	}
 }
 
 
@@ -174,10 +170,10 @@ void chassis_power_control()
 	chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit;
 	if(Power_Heat_Data.buffer_energy<LIMIT_POWER_BUFF)
 	{
-		power_scale=Power_Heat_Data.buffer_energy/LIMIT_POWER_BUFF;
+		power_scale=pow(Power_Heat_Data.buffer_energy/LIMIT_POWER_BUFF,2.0f);
 		chassis_control.power_limit_set*=power_scale;
 	}
-	Total_current_limit=20000+PID_calc(&chassis_control.give_current_pid,cap_data.chassis_power,chassis_control.power_limit_set);
+	Total_current_limit=20000+PID_calc(&chassis_control.give_current_pid,Power_Heat_Data.chassis_power,chassis_control.power_limit_set);
 	
 	for(uint8_t i=0;i<4;i++)
 	{
@@ -227,6 +223,7 @@ void chassis_power_control()
 			}
 		}
 	}
+	CAN_Cap_CMD(chassis_control.power_limit_set,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
 }
 
 
@@ -278,22 +275,29 @@ void chassis_cap_power_control()
 		}
 	}
 	
-	if(cap_data.cap_per<0.4f)
+	if(Game_Robot_Status.chassis_power_limit>=400.0f)
 	{
-		PID_calc(&chassis_control.buffer_energy_pid,20.0f-Power_Heat_Data.buffer_energy,0);
-		CAN_Cap_CMD(Game_Robot_Status.chassis_power_limit+chassis_control.buffer_energy_pid.out,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
-	}
-	else if(cap_data.cap_per<0.7f)
-	{
-		PID_calc(&chassis_control.buffer_energy_pid,40.0f-Power_Heat_Data.buffer_energy,0);
-		CAN_Cap_CMD(Game_Robot_Status.chassis_power_limit+chassis_control.buffer_energy_pid.out,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
+		CAN_Cap_CMD(400.0f,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
+		PID_clear(&chassis_control.buffer_energy_pid);
 	}
 	else 
 	{
-		PID_clear(&chassis_control.buffer_energy_pid);
-		CAN_Cap_CMD(Game_Robot_Status.chassis_power_limit,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
+		if(cap_data.cap_per<0.4f)
+		{
+			PID_calc(&chassis_control.buffer_energy_pid,20.0f-Power_Heat_Data.buffer_energy,0);
+			CAN_Cap_CMD(Game_Robot_Status.chassis_power_limit+chassis_control.buffer_energy_pid.out,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
+		}
+		else if(cap_data.cap_per<0.7f)
+		{
+			PID_calc(&chassis_control.buffer_energy_pid,40.0f-Power_Heat_Data.buffer_energy,0);
+			CAN_Cap_CMD(Game_Robot_Status.chassis_power_limit+chassis_control.buffer_energy_pid.out,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
+		}
+		else 
+		{
+			PID_clear(&chassis_control.buffer_energy_pid);
+			CAN_Cap_CMD(Game_Robot_Status.chassis_power_limit,Power_Heat_Data.chassis_power,Power_Heat_Data.buffer_energy,0);
+		}
 	}
-	
 	cap_data.cap_recieve_count++;
 	if(cap_data.cap_recieve_count>=250)	//1秒清空超电标志位
 	{
@@ -339,7 +343,7 @@ float acc_SlantAngle_calc(float pitch,float roll)
 		return 0;
 }
 
-float ang_offset=4.5;
+float ang_offset=8.0f;
 //车体至底盘解算
 void chassis_solve()
 {
@@ -351,8 +355,8 @@ void chassis_solve()
 	}
 	else
 	{
-		chassis_control.ramp_vx=RAMP(chassis_control.ramp_vx,chassis_control.vx,15.0f+20.0f*RotAngle_Acc+40.0f*SlantAngle_Acc);
-		chassis_control.ramp_vy=RAMP(chassis_control.ramp_vy,chassis_control.vy,15.0f+20.0f*RotAngle_Acc+40.0f*SlantAngle_Acc);
+		chassis_control.ramp_vx=RAMP(chassis_control.ramp_vx,chassis_control.vx,15.0f+20.0f*RotAngle_Acc+20.0f*SlantAngle_Acc);
+		chassis_control.ramp_vy=RAMP(chassis_control.ramp_vy,chassis_control.vy,15.0f+20.0f*RotAngle_Acc+20.0f*SlantAngle_Acc);
 		chassis_control.ramp_wz=RAMP(chassis_control.ramp_wz,chassis_control.wz,35.0f);
 	}
 	float temp_speed_vx=DEADBAND(chassis_control.ramp_vx,120);
@@ -384,7 +388,7 @@ void chassis_solve()
 		ang_err_all[3] = limit_pi(1.5f*PI+chassis_control.chassis_follow_gimbal_err);
 		float ang_err=ang_err_all[0];
 		for(uint8_t i=0;i<4;i++)
-			if(fabs(ang_err_all[i])<fabs(ang_err))ang_err=ang_err_all[i];
+			if(fabs(ang_err_all[i])<fabs(ang_err))	ang_err=ang_err_all[i];
 			
 		PID_calc(&chassis_control.chassis_psi,ang_err,0);
 		chassis_helm.wz=chassis_control.chassis_psi.out;
@@ -403,7 +407,7 @@ void Chassis_Task(void const * argument)
 //	PID_init_s(&chassis_control.chassis_psi,0,8000,0,48000,10000,0);
 	PID_init_s(&chassis_control.chassis_psi,0,5000,0,5000,10000,0);
 	PID_init_s(&chassis_control.give_current_pid,1,50,3,50,65000,20000);
-	PID_init_s(&chassis_control.buffer_energy_pid,1,20,5,5,20,10);
+	PID_init_s(&chassis_control.buffer_energy_pid,1,10,5,5,30,15);
 	
 	while(1)
 	{

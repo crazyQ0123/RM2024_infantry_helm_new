@@ -4,16 +4,17 @@
 #include "Shoot_Task.h"
 #include "remote_control.h"
 #include "referee.h"
-//#include "Nmanifold_usart_task.h"
 #include "Chassis_Task.h"
 #include "My_Def.h"
 #include "Usb_Task.h"
 #include "referee_usart_task.h"
 
-
-#define DIAL_SPEED_LOW  3200//1800
-#define DIAL_SPEED_HIGH 4320
-
+#ifdef INFANTRY_HELM_NEW
+#define DIAL_SPEED 4320		//16*270
+#endif
+#ifdef INFANTRY_HELM_OLD
+#define DIAL_SPEED (4320*4/3)  //16*360
+#endif
 
 RC_ctrl_t rc_ctrl_last;
 
@@ -34,8 +35,6 @@ float auto_aim_pitch_offset=0;
 
 uint32_t switch_180_cnt=501;
 uint8_t chassis_follow_gimbal_changing=0;
-uint16_t box_lid_cnt=0;
-//int16_t speed_temp = DIAL_SPEED_HIGH;
 
 void Switch_Task(void const * argument)
 {
@@ -76,10 +75,9 @@ void Switch_Task(void const * argument)
 			//dial
 			if(dial_mode==0)//Á¬·¢
 			{
-				if(rc_ctrl.rc.s[0]==RC_SW_UP||rc_ctrl.mouse.press_l)    
+				if((rc_ctrl.rc.s[0]==RC_SW_UP||rc_ctrl.mouse.press_l)&&(Power_Heat_Data.shooter_17mm_1_barrel_heat<Game_Robot_Status.shooter_barrel_heat_limit-30||KEYB_FORCED_FIRING))    
 				{
-					//dial_speed = DIAL_SPEED_LOW;
-					dial_speed = DIAL_SPEED_HIGH;
+					dial_speed = DIAL_SPEED;
 				}
 				else
 					dial_speed=0;
@@ -113,12 +111,6 @@ void Switch_Task(void const * argument)
 			}
 		}
 		
-//		if(KEYB_AIM_ARMOR)
-//		{
-//			Autoaim_Armor+=0x04;
-//			if(Autoaim_Armor>0x08) Autoaim_Armor=0x00;
-//		}
-		
 		if(KEYB_SPEED_GEAR)
 		{
 			Speed_Mode++;
@@ -134,7 +126,6 @@ void Switch_Task(void const * argument)
 		//dial mode
 		if(Autoaim_Mode==0||(Autoaim_Mode==1&&nuc_receive_data.aim_data_received.target_number<9)) dial_mode=0;
 		else if(Autoaim_Mode==2||Autoaim_Mode==3) dial_mode=1;
-//		else if(Autoaim_Mode==2||Autoaim_Mode==3||(Autoaim_Mode==1&&nuc_receive_data.aim_data_received.target_number>=9)) dial_mode=1;
 		if(dial_mode==1&&dial_mode_last==0) shoot_m2006[0].angle_set=shoot_m2006[0].angle;
 		autoaim_last_shoot_freq =nuc_receive_data.aim_data_received.target_rate;
 		rc_ctrl_last=rc_ctrl;	

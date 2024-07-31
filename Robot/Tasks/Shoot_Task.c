@@ -13,7 +13,7 @@
 #include "math.h"
 #include "Usb_Task.h"
 
-
+#ifdef INFANTRY_HELM_NEW
 #define SHOOT_MOTOR_SPEED_PID_KP 12.0f//8.0f
 #define SHOOT_MOTOR_SPEED_PID_KI 0.8f//0.3f
 #define SHOOT_MOTOR_SPEED_PID_KD 0.0f
@@ -25,6 +25,21 @@
 #define SHOOT_MOTOR_ANGLE_PID_KD 0.3f//0.8f
 #define SHOOT_MOTOR_ANGLE_PID_MAX_OUT 5000.0f
 #define SHOOT_MOTOR_ANGLE_PID_MAX_IOUT 10000.0f
+#endif
+
+#ifdef INFANTRY_HELM_OLD
+#define SHOOT_MOTOR_SPEED_PID_KP 8.0f
+#define SHOOT_MOTOR_SPEED_PID_KI 0.4f
+#define SHOOT_MOTOR_SPEED_PID_KD 0.0f
+#define SHOOT_MOTOR_SPEED_PID_MAX_OUT 16000.0f
+#define SHOOT_MOTOR_SPEED_PID_MAX_IOUT 8000.0f
+
+#define SHOOT_MOTOR_ANGLE_PID_KP 0.2f//0.6f
+#define SHOOT_MOTOR_ANGLE_PID_KI 0.0f
+#define SHOOT_MOTOR_ANGLE_PID_KD 0.2f//0.8f
+#define SHOOT_MOTOR_ANGLE_PID_MAX_OUT 5000.0f
+#define SHOOT_MOTOR_ANGLE_PID_MAX_IOUT 10000.0f
+#endif
 
 shoot_motor_t shoot_m2006[1];
 uint8_t fric_state=0;//0:off,1:on
@@ -66,40 +81,13 @@ void Shoot_Motor_Data_Update(void)
 	shoot_m2006[0].angle=dial_angle;
 }
 
-//extern ext_shoot_data_t shoot_data_t;
-//float bullet_speed_max=0,bullet_speed_min=30;
 void Fric_Motor_Control(void)
 {
-//	if(Game_Robot_Status.shooter_id1_17mm_speed_limit>=30)
-//	{
-////		if(dial_mode==1)
-			fric_speed=fric_30m;
-		  fric_actual_speed=30;
-////		else
-////			fric_speed=fric_15m;
-//	}
-//	else if(Game_Robot_Status.shooter_id1_17mm_speed_limit>=18)
-//	{
-//		fric_speed=fric_18m;
-//	  fric_actual_speed=18;
-//	}
-//	else
-//	{
-//		fric_speed=fric_15m;
-//		fric_actual_speed=15;
-//	}
-    
-
-//		fric_speed=fric_15m;
-//	  FRIC_PWM_R=textspeed;
-//	  FRIC_PWM_L=textspeed;
+		fric_speed=fric_30m;
+		fric_actual_speed=30;
 
     Fric_PWR(fric_state);
-	
-//	if(shoot_data_t.bullet_speed>bullet_speed_max)
-//		bullet_speed_max=shoot_data_t.bullet_speed;
-//	if(shoot_data_t.bullet_speed<bullet_speed_min&&shoot_data_t.bullet_speed!=0)
-//		bullet_speed_min=shoot_data_t.bullet_speed;
+
 }
 
 uint16_t dial_single_cnt=0;
@@ -128,7 +116,6 @@ void Dial_Motor_Control(void)
 			}
 		}
 	}
-	
 	if(fric_state==1)
 	{
 		if(dial_mode==0)//continue
@@ -163,6 +150,7 @@ void Dial_Motor_Control(void)
 	{
 		shoot_m2006[0].speed_set=0;
 	}
+
 //	if((rc_ctrl.mouse.press_r||rc_ctrl .rc .ch [4]>=300)&&AutoAim_Data_Receive .Shoot_Freq==0&&dial_speed!=0)
 //	{ 
 //		if(preload_flag)
