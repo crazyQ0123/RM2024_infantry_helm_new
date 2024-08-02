@@ -2,10 +2,11 @@
 #include "Usb_Task.h"
 #include "My_Def.h"
 #include "INS_Task.h"
+#include "referee.h"
 
 //small low high
 nuc_receive_data_t	nuc_receive_data;
-nuc_transmit_data_t 	nuc_transmit_data={.nuc_start_record.nuc_record_flag=False};
+nuc_transmit_data_t 	nuc_transmit_data;
 cmd_id_queue_t cmd_id_queue;
 
 /*************************** SEND ********************************/
@@ -16,40 +17,53 @@ void data_update(uint8_t cmd_id)
 		{
         case GIMBAL_AND_CONFIG_SEND_ID:
             /*  Update the value of variables here START*/
-            nuc_transmit_data.robot_gimbal_data_send.camera_id=0;
-						nuc_transmit_data.robot_gimbal_data_send.is_pressing=rc_ctrl.mouse.press_r||(rc_ctrl.rc.ch[4]>200);
-            nuc_transmit_data.robot_gimbal_data_send.pitch=PITCH;
-            nuc_transmit_data.robot_gimbal_data_send.yaw=YAW;
-            nuc_transmit_data.robot_gimbal_data_send.roll=ROLL;
-            nuc_transmit_data.robot_gimbal_data_send.mode=Autoaim_Mode/2;
-						nuc_transmit_data.robot_gimbal_data_send.mode_config[0]=Autoaim_Mode%2;
+						nuc_transmit_data.robot_gimbal_data_send.roll=		ROLL;
+            nuc_transmit_data.robot_gimbal_data_send.pitch=		PITCH;
+            nuc_transmit_data.robot_gimbal_data_send.yaw	=		YAW;
+				
+				
+						if(Game_Robot_Status.robot_id<100)
+						{
+							switch(Autoaim_Mode)
+							{
+								case 0:
+									nuc_transmit_data.robot_gimbal_data_send.mode	=1;
+									break;
+								case 1:
+									nuc_transmit_data.robot_gimbal_data_send.mode	=2;
+									break;
+								case 2:
+									nuc_transmit_data.robot_gimbal_data_send.mode	=4;
+									break;
+								default:
+									break;
+							}
+						}
+						else 
+						{
+							switch(Autoaim_Mode)
+							{
+								case 0:
+									nuc_transmit_data.robot_gimbal_data_send.mode	=0;
+									break;
+								case 1:
+									nuc_transmit_data.robot_gimbal_data_send.mode	=3;
+									break;
+								case 2:
+									nuc_transmit_data.robot_gimbal_data_send.mode	=5;
+									break;
+								default:
+									break;
+							}
+						}
+				//r 0
+				//b   1
+				//r xfu 2
+				//b xfu  3
+				//r dfu 4
+				//b dfu 5
             /*  Update the value of variables here END*/
             break;
-				case NUC_START_RECORD:
-						/*update_record_pressed_if here*/ 
-						if(nuc_transmit_data.nuc_start_record.nuc_record_flag==False)
-						{
-							nuc_transmit_data.nuc_start_record.nuc_pressed_cnt=0;
-							nuc_transmit_data.nuc_start_record.start_record_if=NUC_PRESSED_FLAG;
-						}
-						else
-						{
-							if(nuc_transmit_data.nuc_start_record.nuc_pressed_cnt<4000)
-							{
-								nuc_transmit_data.nuc_start_record.start_record_if=False;
-							}
-							else
-							{
-								nuc_transmit_data.nuc_start_record.nuc_record_flag=False;
-							}
-							if(NUC_PRESSED_FLAG==False)
-							{
-								nuc_transmit_data.nuc_start_record.nuc_pressed_cnt++;
-							}
-						}
-						
-						/*update_record_pressed_if here*/
-						break;
         default:
             break;
     }
@@ -60,41 +74,33 @@ void data_update(uint8_t cmd_id)
 void send_data_to_nuc(uint8_t cmd_id)
 {
     uint16_t len;
-    uint8_t t[10][4];
-		usb_cdc_data.usb_cdc_send_buf[0]=0xAA;
-    
+//    uint8_t t[10][4];
+//		usb_cdc_data.usb_cdc_send_buf[0]=0xAA;
+//    
     switch (cmd_id)
     {
         case GIMBAL_AND_CONFIG_SEND_ID:
-            len=sizeof(nuc_transmit_data.robot_gimbal_data_send)+4;    
-            float_to_u8(&nuc_transmit_data.robot_gimbal_data_send.pitch,t[0]);
-            float_to_u8(&nuc_transmit_data.robot_gimbal_data_send.roll,t[1]);
-            float_to_u8(&nuc_transmit_data.robot_gimbal_data_send.yaw,t[2]);
-            for(int i=0;i<3;i++){
-                for(int j=0;j<4;j++){
-                    usb_cdc_data.usb_cdc_send_buf[4+i*4+j]=t[i][j];
-                }
-            }
-            usb_cdc_data.usb_cdc_send_buf[16]=nuc_transmit_data.robot_gimbal_data_send.is_pressing;
-            usb_cdc_data.usb_cdc_send_buf[17]=nuc_transmit_data.robot_gimbal_data_send.mode;
-            for(int i=0;i<8;i++){
-                usb_cdc_data.usb_cdc_send_buf[18+i]=nuc_transmit_data.robot_gimbal_data_send.mode_config[i];
-            }
-            usb_cdc_data.usb_cdc_send_buf[26]=nuc_transmit_data.robot_gimbal_data_send.camera_id;
-            break;
-				case NUC_START_RECORD:
-						len=sizeof(nuc_transmit_data.nuc_start_record.start_record_if)+5;
-						usb_cdc_data.usb_cdc_send_buf[4]=nuc_transmit_data.nuc_start_record.start_record_if;
+							len=16;
+							usb_cdc_data.usb_cdc_send_buf[0]=0xff;
+							usb_cdc_data.usb_cdc_send_buf[1]= nuc_transmit_data.robot_gimbal_data_send.mode;
+							memcpy((uint8_t*)&usb_cdc_data.usb_cdc_send_buf[2],(uint8_t*)&nuc_transmit_data.robot_gimbal_data_send.roll,4);
+							memcpy((uint8_t*)&usb_cdc_data.usb_cdc_send_buf[6],(uint8_t*)&nuc_transmit_data.robot_gimbal_data_send.pitch,4);
+							memcpy((uint8_t*)&usb_cdc_data.usb_cdc_send_buf[10],(uint8_t*)&nuc_transmit_data.robot_gimbal_data_send.yaw,4);
+							usb_cdc_data.usb_cdc_send_buf[14]=0x00;
+							usb_cdc_data.usb_cdc_send_buf[15]=0x0d;
 						break;
         default:
             break;
-    }
-	
-		usb_cdc_data.usb_cdc_send_buf[3]=cmd_id;
-		usb_cdc_data.usb_cdc_send_buf[1]=(len);
-    usb_cdc_data.usb_cdc_send_buf[2]=((len>>8));
-    usb_cdc_data.usb_cdc_send_buf[len-1]=CRC_Calculation(usb_cdc_data.usb_cdc_send_buf,len-1);
+			}
     usb_data_send(usb_cdc_data.usb_cdc_send_buf,len);
+		//send
+		// uint8_t 0xff	
+		// uint8_t  mode
+		// fp32    roll	
+		// fp32   pitch	
+		// fp32    yaw	
+		// uint8_t 0x00	
+		// uint8_t 0x0d	
 }
 
 //AA 0C 00 13 00 01 02 03 04 05 06 07 08 09 0A XX
@@ -106,37 +112,19 @@ void Nuc_data_unpacked()
 {
     if(usb_cdc_data.usb_cdc_rx_flag==1)
 		{
-        if(usb_cdc_data.usb_cdc_rx_buf[0]==0xAA)
-				{
-//			usb_cdc_data.usb_cdc_rx_len=(uint16_t)((usb_cdc_data.usb_cdc_rx_buf[2] << 8) |usb_cdc_data.usb_cdc_rx_buf[1])+4;
-					usb_cdc_data.crc_cal=CRC_Calculation(usb_cdc_data.usb_cdc_rx_buf,usb_cdc_data.usb_cdc_rx_len-1);
-            if(usb_cdc_data.crc_cal==usb_cdc_data.usb_cdc_rx_buf[usb_cdc_data.usb_cdc_rx_len-1])
-						{
-                uint8_t t[4][4];
-                switch (usb_cdc_data.usb_cdc_rx_buf[3])
-                {
-                    case AIM_DATA_RECV_ID:
-                        for(int i=0;i<4;i++)
-												{
-                            for(int j=0;j<4;j++)
-														{
-                                t[i][j]=usb_cdc_data.usb_cdc_rx_buf[4+i*4+j];
-                            }
-                        }
-                        u8_to_float(t[0],&nuc_receive_data.aim_data_received.yaw);
-                        u8_to_float(t[1],&nuc_receive_data.aim_data_received.pitch);
-												u8_to_float(t[2],&nuc_receive_data.aim_data_received.Omega_yaw);
-												u8_to_float(t[3],&nuc_receive_data.aim_data_received.Omega_pitch);
-                        nuc_receive_data.aim_data_received.target_rate=usb_cdc_data.usb_cdc_rx_buf[20];
-                        nuc_receive_data.aim_data_received.target_number=usb_cdc_data.usb_cdc_rx_buf[21];
-                        nuc_receive_data.aim_data_received.success=usb_cdc_data.usb_cdc_rx_buf[22];
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-		usb_cdc_data.usb_cdc_rx_flag=0;
+			if(usb_cdc_data.usb_cdc_rx_buf[0]==0xff&&usb_cdc_data.usb_cdc_rx_buf[15]==0x0d)
+			{
+        nuc_receive_data.aim_data_received.is_fire=usb_cdc_data.usb_cdc_rx_buf[1];
+				memcpy(&nuc_receive_data.aim_data_received.pitch,&usb_cdc_data.usb_cdc_rx_buf[2],4);
+				memcpy(&nuc_receive_data.aim_data_received.yaw,&usb_cdc_data.usb_cdc_rx_buf[6],4);
+				memcpy(&nuc_receive_data.aim_data_received.distance,&usb_cdc_data.usb_cdc_rx_buf[10],4);
+				nuc_receive_data.aim_data_received.target_number=usb_cdc_data.usb_cdc_rx_buf[14];
+				if(nuc_receive_data.aim_data_received.distance>0) 
+					nuc_receive_data.aim_data_received.success=1;
+				else  
+					nuc_receive_data.aim_data_received.success=0;
+			}
+			usb_cdc_data.usb_cdc_rx_flag=0;
     }
 }
 
@@ -170,15 +158,7 @@ void cmd_id_queue_handle()
 		for(int i=0;i<cmd_id_queue.total_num;i++){
 				if(cmd_id_queue.now_pos%cmd_id_queue.cmd_id_frq[i]==0){
 					data_update(cmd_id_queue.cmd_id_queue[i]);
-					if(cmd_id_queue.cmd_id_queue[i]==NUC_START_RECORD){
-						if(nuc_transmit_data.nuc_start_record.start_record_if==True && nuc_transmit_data.nuc_start_record.nuc_record_flag==False){
-								send_data_to_nuc(cmd_id_queue.cmd_id_queue[i]);
-								nuc_transmit_data.nuc_start_record.nuc_record_flag=True;
-						}
-					}
-					else{
-						send_data_to_nuc(cmd_id_queue.cmd_id_queue[i]);
-					}
+					send_data_to_nuc(cmd_id_queue.cmd_id_queue[i]);
 				}
 		}
     cmd_id_queue.now_pos++;

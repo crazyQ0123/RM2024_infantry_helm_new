@@ -28,8 +28,6 @@ extern ext_robot_status_t Game_Robot_Status;
 extern fifo_s_t Referee_FIFO;
 uint32_t shoot_power_good_cnt=0;
 uint8_t if_predict=0;//0:no,1:yes
-uint8_t autoaim_last_shoot_freq=0;
-uint8_t autoaim_shoot_freq=0;
 uint8_t dial_mode_last=0;
 float auto_aim_pitch_offset=0;
 
@@ -121,13 +119,12 @@ void Switch_Task(void const * argument)
 		{
 			//autoaim mode
 			Autoaim_Mode++;
-			if(Autoaim_Mode>3) Autoaim_Mode=0;
+			if(Autoaim_Mode>2) Autoaim_Mode=0;
 		}
 		//dial mode
-		if(Autoaim_Mode==0||(Autoaim_Mode==1&&nuc_receive_data.aim_data_received.target_number<9)) dial_mode=0;
-		else if(Autoaim_Mode==2||Autoaim_Mode==3) dial_mode=1;
+		if(Autoaim_Mode==0) dial_mode=0;
+		else if(Autoaim_Mode==1||Autoaim_Mode==2) dial_mode=1;
 		if(dial_mode==1&&dial_mode_last==0) shoot_m2006[0].angle_set=shoot_m2006[0].angle;
-		autoaim_last_shoot_freq =nuc_receive_data.aim_data_received.target_rate;
 		rc_ctrl_last=rc_ctrl;	
 		dial_mode_last=dial_mode;
 		vTaskDelay(2);

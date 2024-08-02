@@ -311,12 +311,12 @@ void referee_usart_task(void const * argument)
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 			//¶¯Ì¬UIÔ¤»æÖÆ AUTO_AIM_MODE
-			UI_Draw_String(&UI_String.String, "106", UI_Graph_Add, 1, UI_Color_White,  20, 6, 3,  1830, 685, "NORM  "); 
+			UI_Draw_String(&UI_String.String, "106", UI_Graph_Add, 1, UI_Color_White,  20, 6, 3,  1830, 685, "AUTO  "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
-			UI_Draw_String(&UI_String.String, "107", UI_Graph_Add, 1, UI_Color_Black,  20, 6, 3,  1725, 605, "ANTI ");
-			UI_PushUp_String(&UI_String, Robot_ID_Current);
-			osDelay(UI_UPDATE_DELAY);
+//			UI_Draw_String(&UI_String.String, "107", UI_Graph_Add, 1, UI_Color_Black,  20, 6, 3,  1725, 605, "ANTI ");
+//			UI_PushUp_String(&UI_String, Robot_ID_Current);
+//			osDelay(UI_UPDATE_DELAY);
 			UI_Draw_String(&UI_String.String, "108", UI_Graph_Add, 1, UI_Color_Black,  20, 6, 3,  1720, 505, "SMALL "); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
@@ -474,15 +474,15 @@ void referee_usart_task(void const * argument)
 			switch(UI_AutoAim_Mode_last)
 			{
 				case 0:
-					UI_Draw_String(&UI_String.String, "106", UI_Graph_Change, 1, UI_Color_Black,  20, 6, 3,  1830, 685, "NORM  "); 
+					UI_Draw_String(&UI_String.String, "106", UI_Graph_Change, 1, UI_Color_Black,  20, 6, 3,  1830, 685, "AUTO  "); 
 					break;
+//				case 1:
+//					UI_Draw_String(&UI_String.String, "107", UI_Graph_Change, 1, UI_Color_Black,  20, 6, 3,  1725, 605, "ANTI ");
+//					break;
 				case 1:
-					UI_Draw_String(&UI_String.String, "107", UI_Graph_Change, 1, UI_Color_Black,  20, 6, 3,  1725, 605, "ANTI ");
-					break;
-				case 2:
 					UI_Draw_String(&UI_String.String, "108", UI_Graph_Change, 1, UI_Color_Black,  20, 6, 3,  1720, 505, "SMALL "); 
 					break;
-				case 3:
+				case 2:
 					UI_Draw_String(&UI_String.String, "109", UI_Graph_Change, 1, UI_Color_Black,  20, 6, 3,  1845, 430, "BIG  "); 
 					break;
 				default:
@@ -494,15 +494,15 @@ void referee_usart_task(void const * argument)
 			switch(UI_AutoAim_Mode)
 			{
 				case 0:
-					UI_Draw_String(&UI_String.String, "106", UI_Graph_Change, 1, UI_Color_White,  20, 6, 3,  1830, 685, "NORM  "); 
+					UI_Draw_String(&UI_String.String, "106", UI_Graph_Change, 1, UI_Color_White,  20, 6, 3,  1830, 685, "AUTO  "); 
 					break;
+//				case 1:
+//					UI_Draw_String(&UI_String.String, "107", UI_Graph_Change, 1, UI_Color_White,  20, 6, 3,  1725, 605, "ANTI ");
+//					break;
 				case 1:
-					UI_Draw_String(&UI_String.String, "107", UI_Graph_Change, 1, UI_Color_White,  20, 6, 3,  1725, 605, "ANTI ");
-					break;
-				case 2:
 					UI_Draw_String(&UI_String.String, "108", UI_Graph_Change, 1, UI_Color_White,  20, 6, 3,  1720, 505, "SMALL "); 
 					break;
-				case 3:
+				case 2:
 					UI_Draw_String(&UI_String.String, "109", UI_Graph_Change, 1, UI_Color_White,  20, 6, 3,  1845, 430, "BIG  "); 
 					break;
 				default:

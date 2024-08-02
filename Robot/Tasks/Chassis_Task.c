@@ -109,7 +109,7 @@ static void chassis_pc_ctrl(void)
 		}
 		else if(Speed_Mode==1)
 		{
-			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit*1.0f;
+			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit;
 			temp_vx = NORMAL_VX_MAX;
 			temp_vy = NORMAL_VY_MAX;
 			temp_wz = NORMAL_WZ_MAX;
@@ -234,9 +234,9 @@ void chassis_cap_power_control()
 	fp32 power_scale=0;
 	fp32 Helm_current=0,Wheel_current=0;
 	
-	if(cap_data.cap_per<0.5f)
+	if(cap_data.cap_per<0.4f)
 	{
-		power_scale=cap_data.cap_per/0.5;
+		power_scale=cap_data.cap_per/0.4;
 		chassis_control.power_limit_set*=power_scale;
 	}
 	if(Power_Heat_Data.buffer_energy<LIMIT_POWER_BUFF)

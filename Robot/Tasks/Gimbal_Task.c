@@ -174,10 +174,10 @@ extern uint8_t chassis_follow_gimbal_changing;
 
 uint8_t is_valid()
 {
-	return 	isnan(nuc_receive_data.aim_data_received.pitch)||isinf(nuc_receive_data.aim_data_received.pitch)||
+	return 	isnan(nuc_receive_data.aim_data_received.is_fire)||isinf(nuc_receive_data.aim_data_received.is_fire)||
 					isnan(nuc_receive_data.aim_data_received.yaw)||isinf(nuc_receive_data.aim_data_received.yaw)||
-					isnan(nuc_receive_data.aim_data_received.target_rate)||isinf(nuc_receive_data.aim_data_received.target_rate)||
-					isnan(nuc_receive_data.aim_data_received.target_number)||isinf(nuc_receive_data.aim_data_received.target_number)||
+					isnan(nuc_receive_data.aim_data_received.pitch)||isinf(nuc_receive_data.aim_data_received.pitch)||
+					isnan(nuc_receive_data.aim_data_received.distance)||isinf(nuc_receive_data.aim_data_received.distance)||
 					isnan(nuc_receive_data.aim_data_received.success)||isinf(nuc_receive_data.aim_data_received.success);
 }
 
@@ -381,10 +381,7 @@ void Yaw_Motor_Control(void)
 		else
 		{
 			PID_calc(&gimbal_LK[0].auto_aim_pid,yaw_angle_err,-aim_adjust_yaw);
-			if(ABS(gimbal_LK[0].auto_aim_pid.error[0])>2)
-				gimbal_LK[0].INS_speed_set=-gimbal_LK[0].auto_aim_pid.out;
-			else 
-				gimbal_LK[0].INS_speed_set=-gimbal_LK[0].auto_aim_pid.out+0.8f*nuc_receive_data.aim_data_received.Omega_yaw;
+			gimbal_LK[0].INS_speed_set=-gimbal_LK[0].auto_aim_pid.out;
 			gimbal_LK[0].INS_angle_set=nuc_receive_data.aim_data_received.yaw ;
 		}
 	}
@@ -453,7 +450,7 @@ void Pitch_Motor_Control(void)
 				else 
 				{
 					PID_calc(&gimbal_LK[1].auto_aim_pid, gimbal_LK[1].INS_angle, nuc_receive_data.aim_data_received.pitch + aim_adjust_pitch);
-					gimbal_LK[1].INS_speed_set = gimbal_LK[1].auto_aim_pid.out+nuc_receive_data.aim_data_received.Omega_pitch;
+					gimbal_LK[1].INS_speed_set = gimbal_LK[1].auto_aim_pid.out;
 
 					gimbal_LK[1].INS_angle_set = nuc_receive_data.aim_data_received.pitch;
 				}
@@ -463,7 +460,7 @@ void Pitch_Motor_Control(void)
 				aim_adjust_pitch = 0;
 				if(rc_ctrl.mouse.y != 0)
 				{
-					MouseY_angle=MouseY_angle*0.95f+rc_ctrl.mouse.y*0.05f;
+					MouseY_angle=rc_ctrl.mouse.y;
 					gimbal_LK[1].INS_angle_set -= MouseY_angle*PITCH_MOUSE_SEN;
 				}
 				else if(rc_ctrl.rc.ch[1]!=0)

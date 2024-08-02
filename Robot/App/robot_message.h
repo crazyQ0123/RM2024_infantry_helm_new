@@ -21,31 +21,21 @@
 #define False 0
 
 typedef struct{
+	uint8_t 										is_fire;
 	float 											yaw;						// бу
 	float 											pitch;					// бу
-	float												Omega_yaw;			// бу/s
-	float												Omega_pitch;		// бу/s
-	uint8_t 										target_rate;
+	float												distance;
 	uint8_t 										target_number;
 	uint8_t 										success;
 }aim_data_t;
 
 
 typedef struct{
-		float 											pitch;
   	float 											roll;
+		float 											pitch;
   	float 											yaw;
-  	uint8_t											is_pressing;
   	uint8_t 										mode;
-  	uint8_t 										mode_config[8];
-  	uint8_t                     					camera_id;
 }gimbal_and_config_data_t;
-
-typedef struct{
-	uint8_t start_record_if;
-	uint8_t nuc_record_flag;
-	uint16_t nuc_pressed_cnt;
-}nuc_start_record_t;
 
 typedef struct{
 	aim_data_t 										aim_data_received;
@@ -53,7 +43,6 @@ typedef struct{
 
 typedef struct{
 	gimbal_and_config_data_t						robot_gimbal_data_send;
-	nuc_start_record_t					nuc_start_record;
 }nuc_transmit_data_t;
 
 typedef struct{
