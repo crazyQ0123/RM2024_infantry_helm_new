@@ -101,22 +101,23 @@ static void chassis_pc_ctrl(void)
 	{
 		if(Speed_Mode==0)
 		{
-			chassis_control.power_limit_set=(Game_Robot_Status.chassis_power_limit*0.2f<20.0f) ? 
-				Game_Robot_Status.chassis_power_limit*0.8f :Game_Robot_Status.chassis_power_limit-20.0f;
+//			chassis_control.power_limit_set=(Game_Robot_Status.chassis_power_limit*0.2f<20.0f) ? 
+//				Game_Robot_Status.chassis_power_limit*0.8f :Game_Robot_Status.chassis_power_limit-20.0f;
+			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit;
 			temp_vx = SLOW_VX_MAX;
 			temp_vy = SLOW_VY_MAX;
 			temp_wz = SLOW_WZ_MAX;
 		}
 		else if(Speed_Mode==1)
 		{
-			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit;
+			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit+20.0f;
 			temp_vx = NORMAL_VX_MAX;
 			temp_vy = NORMAL_VY_MAX;
 			temp_wz = NORMAL_WZ_MAX;
 		}
 		else if(Speed_Mode==2)
 		{
-			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit+30.0f;
+			chassis_control.power_limit_set=Game_Robot_Status.chassis_power_limit+60.0f;
 			temp_vx = FAST_VX_MAX;
 			temp_vy = FAST_VY_MAX;
 			temp_wz = FAST_WZ_MAX;
@@ -422,9 +423,9 @@ void Chassis_Task(void const * argument)
 		{
 			chassis_pc_ctrl();
 		}
-		if(chassis_helm.slant_angle>8.0f)//检测坡上增加50W底盘功率
+		if(chassis_helm.slant_angle>8.0f)//检测坡上增加70W底盘功率
 		{
-			chassis_control.power_limit_set+=50.0f;
+			chassis_control.power_limit_set+=70.0f;
 		}
 		if(chassis_control.vx_last==0&&chassis_control.vy_last==0&&chassis_control.wz_last==0&&(chassis_control.vx!=0||chassis_control.vy!=0||chassis_control.wz!=0))//起步清零功率pid
 		{

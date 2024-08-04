@@ -49,6 +49,7 @@ float		UI_Gimbal_Pitch =0.0f;	//云台Pitch轴角度
 float   UI_Gimbal_Roll = 0.0f; 	//云台Roll轴角度
 float   UI_Gimbal_Yaw   = 0.0f; //云台Yaw轴角度
 float   UI_Chassis_Follow_Gimbal_Angle=0.0f;//底盘跟随云台角度
+float   UI_distance=0.0f;
 int16_t UI_attack_direction=0;			//受击反馈方向
 uint8_t UI_attack_flag=0;						//受击反馈图形是否已绘制
 uint16_t UI_attack_direction_Counter=0;	//受击反馈图形删除延时
@@ -128,6 +129,7 @@ void referee_usart_task(void const * argument)
 		UI_Chassis_Pitch=gimbal_LK[1].ENC_angle_actual;
 		UI_Gimbal_Pitch=gimbal_LK[1].INS_angle;
 		UI_Gimbal_Roll =INS_angle_deg[1];
+		UI_distance=nuc_receive_data.aim_data_received.distance;
 		UI_fric_mode	=	fric_state;
 		UI_lock_mode  =	nuc_receive_data.aim_data_received.success;
 		itoa(nuc_receive_data.aim_data_received.target_number%9,UI_lock_target_number,10);
@@ -279,14 +281,14 @@ void referee_usart_task(void const * argument)
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 			
-			//动态UI预绘制  shoot 
+			//动态UI预绘制  shoot and distance
 			UI_Draw_Rectangle(&UI_Graph7.Graphic[0], "203", UI_Graph_Add, 2, UI_Color_White,  2,	161 , 758, 191,	788);			 	//摩擦轮图形
 			UI_Draw_Line		 (&UI_Graph7.Graphic[1], "204", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 784,  176, 763);		 	//摩擦轮图形
 			UI_Draw_Rectangle(&UI_Graph7.Graphic[2], "205", UI_Graph_Add, 2, UI_Color_White,  2,	161 , 708, 191,	738);			 	//自瞄图形
 			UI_Draw_Line		 (&UI_Graph7.Graphic[3], "206", UI_Graph_Add, 2, UI_Color_Green, 22, 176, 734,  176, 713);			//自瞄图形
 			UI_Draw_Rectangle(&UI_Graph7.Graphic[4], "207", UI_Graph_Add, 2, UI_Color_White, 2,  681, 743, 1230, 275);	 //自瞄框
 			UI_Draw_Arc			 (&UI_Graph7.Graphic[5], "208", UI_Graph_Add, 2, UI_Color_Orange, 300, 60, 5, 960,  740,100,50);	//受击反馈
-			UI_Draw_Arc			 (&UI_Graph7.Graphic[6], "208", UI_Graph_invalid, 2, UI_Color_Orange, 300, 60, 5, 960,  740,100,50);	//受击反馈
+			UI_Draw_Float		 (&UI_Graph7.Graphic[6], "214", UI_Graph_Add, 2, UI_Color_White, 18, 4, 3, 920, 50,0.000f);	//自瞄距离
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
 			UI_attack_flag=1;
 			UI_fric_flag=1;
@@ -352,6 +354,7 @@ void referee_usart_task(void const * argument)
 			UI_Draw_String(&UI_String.String, "116", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1000,835, "000000"); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
+			
 		}
 		
 		//动态UI更新 受击反馈
@@ -558,8 +561,7 @@ void referee_usart_task(void const * argument)
 				UI_Draw_Int	(&UI_Graph7.Graphic[4], "211", UI_Graph_Change, 2, UI_Color_Orange , 22, 3, 1180,173,UI_Capacitance);
 				UI_Draw_Line(&UI_Graph7.Graphic[5], "212", UI_Graph_Change, 2, UI_Color_Orange , 20,760 , 160, Capacitance_X, 160);
 			}
-			
-			UI_Draw_Line(&UI_Graph7.Graphic[6], "212", UI_Graph_invalid, 2, UI_Color_Orange , 20,760 , 160, Capacitance_X, 160);
+			UI_Draw_Float	(&UI_Graph7.Graphic[6], "214", UI_Graph_Change, 2, UI_Color_White, 18, 4, 3, 920, 50,UI_distance);	//自瞄距离
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 		}

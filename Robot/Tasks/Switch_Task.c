@@ -73,7 +73,7 @@ void Switch_Task(void const * argument)
 			//dial
 			if(dial_mode==0)//Á¬·¢
 			{
-				if((rc_ctrl.rc.s[0]==RC_SW_UP||rc_ctrl.mouse.press_l)&&(Power_Heat_Data.shooter_17mm_1_barrel_heat<Game_Robot_Status.shooter_barrel_heat_limit-30||KEYB_FORCED_FIRING))    
+				if((rc_ctrl.rc.s[0]==RC_SW_UP||rc_ctrl.mouse.press_l)&&(Power_Heat_Data.shooter_17mm_1_barrel_heat<Game_Robot_Status.shooter_barrel_heat_limit-40||KEYB_FORCED_FIRING))    
 				{
 					dial_speed = DIAL_SPEED;
 				}
