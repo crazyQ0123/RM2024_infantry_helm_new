@@ -68,6 +68,7 @@ uint8_t UI_lock_mode   = 0;     //自瞄锁定是否开启
 uint8_t UI_lock_flag		=0;			//自瞄锁定图形是否已绘制
 char UI_lock_target_number[6]  ={0};
 char UI_lock_target_HP[6]			 ={0};
+uint16_t UI_target_HP_graphic=0;
 uint16_t UI_chassis_follow_angle=0;
 uint16_t  UI_chassis_positionX=0;
 uint16_t  UI_chassis_positionY=0;
@@ -142,30 +143,39 @@ void referee_usart_task(void const * argument)
 				{
 					case 1:
 						itoa(Game_Robot_HP.blue_1_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.blue_1_robot_HP;
 						break;
 					case 2:
 						itoa(Game_Robot_HP.blue_2_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.blue_2_robot_HP;
 						break;
 					case 3:
 						itoa(Game_Robot_HP.blue_3_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.blue_3_robot_HP;
 						break;
 					case 4:
 						itoa(Game_Robot_HP.blue_4_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.blue_4_robot_HP;
 						break;
 					case 5:
 						itoa(Game_Robot_HP.blue_5_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.blue_5_robot_HP;
 						break;
 					case 6:
 						itoa(Game_Robot_HP.blue_7_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.blue_7_robot_HP;
 						break;
 					case 7:
 						itoa(Game_Robot_HP.blue_outpost_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.blue_outpost_HP;
 						break;
 					case 8:
 						itoa(Game_Robot_HP.blue_base_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.blue_base_HP;
 						break;
 					default:
 						itoa(0,UI_lock_target_HP,10);
+						UI_target_HP_graphic=0;
 						break;
 				}
 		}
@@ -175,30 +185,39 @@ void referee_usart_task(void const * argument)
 			{
 					case 1:
 						itoa(Game_Robot_HP.red_1_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.red_1_robot_HP;
 						break;
 					case 2:
 						itoa(Game_Robot_HP.red_2_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.red_2_robot_HP;
 						break;
 					case 3:
 						itoa(Game_Robot_HP.red_3_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.red_3_robot_HP;
 						break;
 					case 4:
 						itoa(Game_Robot_HP.red_4_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.red_4_robot_HP;
 						break;
 					case 5:
 						itoa(Game_Robot_HP.red_5_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.red_5_robot_HP;
 						break;
 					case 6:
 						itoa(Game_Robot_HP.red_7_robot_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.red_7_robot_HP;
 						break;
 					case 7:
 						itoa(Game_Robot_HP.red_outpost_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.red_outpost_HP;
 						break;
 					case 8:
 						itoa(Game_Robot_HP.red_base_HP,UI_lock_target_HP,10);
+						UI_target_HP_graphic=Game_Robot_HP.red_base_HP;
 						break;
 					default:
 						itoa(0,UI_lock_target_HP,10);
+						UI_target_HP_graphic=0;
 						break;
 			}
 		}
@@ -351,10 +370,12 @@ void referee_usart_task(void const * argument)
 			UI_Draw_String(&UI_String.String, "115", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1000,885, "000000"); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
-			UI_Draw_String(&UI_String.String, "116", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1000,835, "000000"); 
-			UI_PushUp_String(&UI_String, Robot_ID_Current);
+//			UI_Draw_String(&UI_String.String, "116", UI_Graph_Add, 1, UI_Color_Green,  22, 6, 3,  1000,835, "000000"); 
+//			UI_PushUp_String(&UI_String, Robot_ID_Current);
+//			osDelay(UI_UPDATE_DELAY);
+			UI_Draw_Line(&UI_Graph1.Graphic[0], "116", UI_Graph_Add, 1, UI_Color_Green, 22, 960, 825, 960+UI_target_HP_graphic, 825);
+			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
-			
 		}
 		
 		//动态UI更新 受击反馈
@@ -421,8 +442,11 @@ void referee_usart_task(void const * argument)
 				UI_Draw_String(&UI_String.String, "115", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,885, UI_lock_target_number); 
 				UI_PushUp_String(&UI_String, Robot_ID_Current);
 				osDelay(UI_UPDATE_DELAY);
-				UI_Draw_String(&UI_String.String, "116", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,835, UI_lock_target_HP); 
-				UI_PushUp_String(&UI_String, Robot_ID_Current);
+//				UI_Draw_String(&UI_String.String, "116", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,835, UI_lock_target_HP); 
+//				UI_PushUp_String(&UI_String, Robot_ID_Current);
+//				osDelay(UI_UPDATE_DELAY);
+				UI_Draw_Line(&UI_Graph1.Graphic[0], "116", UI_Graph_Change, 1, UI_Color_Green, 22, 960, 825, 960+UI_target_HP_graphic, 825);
+				UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 				osDelay(UI_UPDATE_DELAY);
 			}
 			else if(UI_lock_mode == 0) 
@@ -432,8 +456,11 @@ void referee_usart_task(void const * argument)
 				UI_Draw_String(&UI_String.String, "115", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,885, "000000"); 
 				UI_PushUp_String(&UI_String, Robot_ID_Current);
 				osDelay(UI_UPDATE_DELAY);
-				UI_Draw_String(&UI_String.String, "116", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,835, "000000"); 
-				UI_PushUp_String(&UI_String, Robot_ID_Current);
+//				UI_Draw_String(&UI_String.String, "116", UI_Operate, 1, UI_Color_Green,  22, 6, 3,  1000,835, "000000"); 
+//				UI_PushUp_String(&UI_String, Robot_ID_Current);
+//				osDelay(UI_UPDATE_DELAY);
+				UI_Draw_Line(&UI_Graph1.Graphic[0], "116", UI_Graph_Change, 1, UI_Color_Green, 22, 960, 825, 960+UI_target_HP_graphic, 825);
+				UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 				osDelay(UI_UPDATE_DELAY);
 			}
 			UI_Draw_Line(&UI_Graph2.Graphic[0], "206", UI_Operate, 2, UI_Color_Green, 22, 176, 734,  176, 713);			 //自瞄图形
@@ -446,8 +473,11 @@ void referee_usart_task(void const * argument)
 			UI_Draw_String(&UI_String.String, "115", UI_Graph_Change, 1, UI_Color_Green,  22, 6, 3,  1000,885, UI_lock_target_number); 
 			UI_PushUp_String(&UI_String, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
-			UI_Draw_String(&UI_String.String, "116", UI_Graph_Change, 1, UI_Color_Green,  22, 6, 3,  1000,835, UI_lock_target_HP); 
-			UI_PushUp_String(&UI_String, Robot_ID_Current);
+//			UI_Draw_String(&UI_String.String, "116", UI_Graph_Change, 1, UI_Color_Green,  22, 6, 3,  1000,835, UI_lock_target_HP); 
+//			UI_PushUp_String(&UI_String, Robot_ID_Current);
+//			osDelay(UI_UPDATE_DELAY);
+			UI_Draw_Line(&UI_Graph1.Graphic[0], "116", UI_Graph_Change, 1, UI_Color_Green, 22, 960, 825, 960+UI_target_HP_graphic, 825);
+			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 		}
 		
