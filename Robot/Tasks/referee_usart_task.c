@@ -72,6 +72,8 @@ uint16_t UI_target_HP_graphic=0;
 uint16_t UI_chassis_follow_angle=0;
 uint16_t  UI_chassis_positionX=0;
 uint16_t  UI_chassis_positionY=0;
+uint16_t  UI_bullet_remaining=0;//允许发弹量
+
 
 uint16_t UI_Move_Start_X=611;
 uint16_t UI_Move_End_X=850;
@@ -134,6 +136,7 @@ void referee_usart_task(void const * argument)
 		UI_fric_mode	=	fric_state;
 		UI_lock_mode  =	nuc_receive_data.aim_data_received.success;
 		itoa(nuc_receive_data.aim_data_received.target_number%9,UI_lock_target_number,10);
+		UI_bullet_remaining=Bullet_Remaining.projectile_allowance_17mm;
 //		UI_chassis_follow_angle=limit_360deg(45-(chassis_control.chassis_follow_gimbal_zero-motor_measure_gimbal[0].ecd)/((fp32)GIMBAL_ECD_RANGE)*360);
 //		UI_chassis_positionX=-arm_sin_f32(UI_chassis_follow_angle)*20;
 //		UI_chassis_positionY=arm_cos_f32(UI_chassis_follow_angle)*20;
@@ -376,6 +379,10 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Line(&UI_Graph1.Graphic[0], "116", UI_Graph_Add, 1, UI_Color_Green, 22, 960, 825, 960+UI_target_HP_graphic, 825);
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
+			
+			UI_Draw_Int		(&UI_Graph1.Graphic[0], "215", UI_Graph_Add, 2, UI_Color_Purple , 28, 3, 500,770,UI_bullet_remaining);
+			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
+			osDelay(UI_UPDATE_DELAY);
 		}
 		
 		//动态UI更新 受击反馈
@@ -593,6 +600,9 @@ void referee_usart_task(void const * argument)
 			}
 			UI_Draw_Float	(&UI_Graph7.Graphic[6], "214", UI_Graph_Change, 2, UI_Color_White, 18, 4, 3, 920, 50,UI_distance);	//自瞄距离
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
+			
+			UI_Draw_Int		(&UI_Graph1.Graphic[0], "215", UI_Graph_Change, 2, UI_Color_Purple , 28, 3, 500,770,UI_bullet_remaining);
+			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 		}
 		
