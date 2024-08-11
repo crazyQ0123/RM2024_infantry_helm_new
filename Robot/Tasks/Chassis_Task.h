@@ -49,15 +49,15 @@
 #define ADJUST_VX_MAX 660*2
 #define ADJUST_VY_MAX 660*2
 #define ADJUST_WZ_MAX 660*2
-#define SLOW_VX_MAX 660*4
-#define SLOW_VY_MAX 660*4
-#define SLOW_WZ_MAX 660*5
-#define NORMAL_VX_MAX 660*7
-#define NORMAL_VY_MAX 660*7
-#define NORMAL_WZ_MAX 660*7
-#define FAST_VX_MAX 660*10
-#define FAST_VY_MAX 660*10
-#define FAST_WZ_MAX 660*10
+#define SLOW_VX_MAX 660*7
+#define SLOW_VY_MAX 660*7
+#define SLOW_WZ_MAX 660*7
+#define NORMAL_VX_MAX 660*9
+#define NORMAL_VY_MAX 660*9
+#define NORMAL_WZ_MAX 660*9
+#define FAST_VX_MAX 660*11
+#define FAST_VY_MAX 660*11
+#define FAST_WZ_MAX 660*11
 #define FLY_VX_MAX 660*12  //ԼΪ3.5m/s
 #define FLY_VY_MAX 660
 #define CHASSIS_SLOW_ADJ 0.78

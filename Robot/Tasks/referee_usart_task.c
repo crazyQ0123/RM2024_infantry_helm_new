@@ -380,9 +380,9 @@ void referee_usart_task(void const * argument)
 			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 			
-			UI_Draw_Int		(&UI_Graph1.Graphic[0], "215", UI_Graph_Add, 2, UI_Color_Purple , 28, 3, 500,770,UI_bullet_remaining);
-			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
-			osDelay(UI_UPDATE_DELAY);
+//			UI_Draw_Int		(&UI_Graph1.Graphic[0], "215", UI_Graph_Add, 2, UI_Color_Purple , 28, 3, 500,770,UI_bullet_remaining);
+//			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
+//			osDelay(UI_UPDATE_DELAY);
 		}
 		
 		//动态UI更新 受击反馈
@@ -601,8 +601,8 @@ void referee_usart_task(void const * argument)
 			UI_Draw_Float	(&UI_Graph7.Graphic[6], "214", UI_Graph_Change, 2, UI_Color_White, 18, 4, 3, 920, 50,UI_distance);	//自瞄距离
 			UI_PushUp_Graphs(7, &UI_Graph7, Robot_ID_Current);
 			
-			UI_Draw_Int		(&UI_Graph1.Graphic[0], "215", UI_Graph_Change, 2, UI_Color_Purple , 28, 3, 500,770,UI_bullet_remaining);
-			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
+//			UI_Draw_Int		(&UI_Graph1.Graphic[0], "215", UI_Graph_Change, 2, UI_Color_Purple , 28, 3, 500,770,UI_bullet_remaining);
+//			UI_PushUp_Graphs(1, &UI_Graph1, Robot_ID_Current);
 			osDelay(UI_UPDATE_DELAY);
 		}
 		
